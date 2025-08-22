@@ -1,0 +1,91 @@
+\chapter{\textsc{P, NP} and Reductions}
+Almost all the algorithms we have studied thus far have been \textbf{polynomial time algorithms} i.e. on inputs of size $n$, their worst-case running time is $O(n^k)$ for some constant $k$. A natural question to ask is whether all problems can be solved in polynomial time. The answer is no.
+
+There are problems that can be solved but not in polynomial time and there are problems which can not be solved via an algorithm. To discuss problems in general think of computational tasks as language recognition problem. A language is a subset of $\{0,1\}^*$. For example: $$L_{\textsc{conn}}=\{x\in\{0,1\}^*\mid x\text{ represents a connected graph}\}$$So main problem we want to think about is to decide whether a given string is in the language or not. These problems are also called decision problems.
+\begin{definition}{Decision Problems}{}
+    Given a language $L\subseteq \{0,1\}^*$ and a string $x\in\{0,1\}^*$ decide whether $x\in L$ or not.
+\end{definition}    An algorithm $\mcA$ solves this problem if $x\in L\iff \mcA(x)=1$. Time complexity of $\mcA$: $T_{\mcA}(n)$ is the maximum running time of $\mcA$ on any string $x$ of length $n$. Since we can work over any set of alphabets and alphabets can  be encoded into binary we will say languages are subset of $\Sg^*$ where $\Sg$ is the finite set of alphabets. 
+\section{Introduction to Complexity Classes}
+Depending on time, space and some other resources based on how much they are used we divide the computational problems into several sets. We call these sets as complexity classes.
+
+\begin{Definition}{Polynomial Running Time}{}
+    A language $L\subseteq\Sg^*$ has a polynomial-time algorithm if there exists $\mcA$ that solves $L$ and $T_{\mcA}(n)=O(n^k)$ for some constant $k$.
+\end{Definition}
+Now we introduce our first complexity class now. This class is called \textsc{P}. $$\textsc{P}\coloneqq \{L\subseteq \Sg^*\mid \text{ there exists a polynomial time algorithm that decides $L$}\}$$ Till now all the algorithms we have studied are in \textsc{P}.
+\begin{question}{}{}
+    What about $L_{\textsc{sat}}, L_{\textsc{3col}}, L_{\textsc{2sat}}, L_{\textsc{conn}}$?
+\end{question}We know $L_{\textsc{conn}}\in \textsc{P}$ since we can run a \textsc{DFS} to check if all the vertex is reachable from a vertex. Also we know $L_{\textsc{2sat}}\in \textsc{P}$. For other languages we don't know if they are in \textsc{P}. But these problems have another noticable nature. Given a potential solution for the problem one can check if that is indeed a solution of the problem or not in polynomial-time. Let's abstract this notion:
+
+\begin{Definition}{Short Certificate of Membership}{}
+    A language have a short certificate of membership if there exists an algorithm $\mcA$ that runs in polynomial time and \begin{align*}
+        \forall\ x\in L,\ \exs\ y\in \text{poly}(|x|),       & \quad \mcA(x,y)=1  \\
+        \forall\ x\notin L,\ \forall\ y\in \text{poly}(|x|), & \quad  \mcA(x,y)=0
+    \end{align*}
+\end{Definition}
+What are the certificates or above-mentioned problems.   \begin{itemize}
+    \item $L_{\textsc{sat}}$: Assignment of the variables. Then we can verify if every clause is satisfied
+    \item $L_{\textsc{3col}}$: Coloring of the edges.  We can verify if all the edges follows the coloring constraint.
+    \item $L_{\textsc{conn}}$: A spanning tree. We can verify if every vertex is present there.
+\end{itemize}
+
+Now we introduce another complexity class called \textsc{NP}. $$\textsc{NP}\coloneqq \{L\subseteq \Sg^*\mid L\text{ has a short certificate of membership}\}$$For \textsc{NP} we call the algorithm to check for the certificate \emph{verifier}.  Another way to think about the class \textsc{NP} is to extend the computer to make ``guesses'' or exists in multiple states simultaneously. This is known as non-determinism. Then \textsc{NP} is the class of languages decided by a polynomial time non-deterministic Turing machine. For example a non-deterministic algorithm for \textsc{3SAT} is \begin{itemize}
+    \item Make a guess for the assignment for each variable.
+    \item If $\phi$ is satisfied return yes else return no.
+\end{itemize}\parinf Naturally any problem which is in \textsc{P} has a short certificate. \begin{Theorem}{}{}
+    $\textsc{P}\subseteq \textsc{NP}$.
+\end{Theorem}\parinn
+Another complexity class which come associated with \textsc{NP} is \textsc{coNP}. $$\textsc{coNP}\coloneqq \overline{\textsc{NP}}$$i.e. the complement set of \textsc{NP}.
+\begin{observation}
+    $\textsc{P}=\overline{\textsc{P}}$
+\end{observation}
+\begin{Theorem}{}{}
+    $\textsc{P}\subseteq \textsc{coNP}$
+\end{Theorem}
+Apart from these two we don't know any relation between \textsc{NP} and \textsc{coNP} whether they are equal or not.
+\section{Reductions}
+\begin{question}{}{}
+    What does it mean for a problem to be at least as hard as another? 
+\end{question}
+To relate hardness of one problem to another we introduce the notion of reductions. There are many reductions. We will only focus on polynomial-time many-one karp reduction. 
+\begin{Definition}{Many-One Karp Reduction}{}
+$L_1,L_2\subseteq\Sg^*$ are two languages. $L_1$ is reducible to $L_2$ under polynomial time many-one karp reduction if and only if there exists a polynomial time computable  function $f:\Sigma^*\to\Sg^*$ such that $\forall\ x\in \Sg^*$ $$x\in L_1\iff f(x)\in L_2$$ and we denote it by $L_1\leq_{m}^{\text{poly}} L_2$. 
+\end{Definition}
+We call a language $L$ to be \textsc{NP}-hard if for every language $L'\in\textsc{NP}$, $L'\leq_{m}^{\text{poly}}L$. And $L$ is called \textsc{NP}-complete if $L\in\textsc{NP}$ and $L$ is \textsc{NP}-hard. 
+\begin{Theorem}{Cook's Theorem}{}
+$3\textsc{SAT}$ is \textsc{NP}-complete.
+\end{Theorem}
+\begin{corolary}{}{}
+    $\overline{\textsc{SAT}}$ is \textsc{coNP}-complete. 
+\end{corolary}
+\section{Some other \textsc{NP}-complete Languages}
+We will now show 3 other problems which are also \textsc{NP}-complete. We will show the following three problems to be \textsc{NP}-complete\begin{itemize}
+    \item \textsc{IndSet} $\coloneqq\{(G,k)\mid \text{Graph }G\text{ has an independent set of size at least $k$}\}$
+    \item \textsc{VC} $\coloneqq\{(G,k)\mid \text{Graph }G\text{ has a vertex cover of size at least $k$}\}$
+    \item \textsc{SubsetSum} $\coloneqq\lt\{(s_1,\dots, s_t, T)\mid \exs\ X\subseteq [t], \sum\limits_{i\in X}s_i=T\rt\}$
+\end{itemize}
+\begin{Theorem}{}{}
+\textsc{IndSet} is \textsc{NP}-complete.
+\end{Theorem}
+\begin{proof}
+    It is natural to see that $\textsc{IndSet}\in\textsc{NP}$. Furthermore, we will show a reduction from $\textsc{3SAT}$ to \textsc{IndSet}. On the input of $\phi$ of \textsc{3SAT} we want to find a $(G,k)$ instance such that $$\phi\text{ is satisfiable}\iff G\text{ has an independent set of size $\geq k$}$$Let $\phi$ has $m$ clauses on $n$ variables. We build a graph $G$ with $3m$ vertices with a triangle for each clause. Each vertex in a triangle corresponds to a literal. Add edge between $x_i$ and $\ovx_i$ for all variables $x_i$. 
+
+    Now with this construction we have ensured that for any variable $x_i$ if the literal $x_i$ is in the independent set then $\ovx_i$ is not in the independent set and vice versa. For each clause one vertex from each triangle is in the independent set. So the target independent set size is of size $n$. 
+
+    Now if there is a satisfying assignment for $\phi$ then we can pick the corresponding vertices representing the literals which are set true and this will constitute an independent set. Similarly, if there is an independent set of size $n$ in $G$ then for each variable we have picked only one literal and from each triangle we have picked only one, so this corresponds to a satisfying assignment.
+\end{proof}
+\begin{Theorem}{}{}
+\textsc{VC} is \textsc{NP}-complete.
+\end{Theorem}
+\begin{proof}
+It is natural to see that $\textsc{VC}\in\textsc{NP}$. We will show a reduction from \textsc{IndSet} to \textsc{VC} for \textsc{NP}-hardness of \textsc{VC}. Notice that for any $S\subseteq V$, $S$ is a vertex cover in $G$ if and only if $V\setminus S$ is an independent set in $G$. Therefore, from the input $(G,K)$ we create the $(G,n-k)$ and this way we found a bijection between independent sets and vertex cover. Hence, \textsc{VC} is \textsc{NP}-complete.
+\end{proof}
+\begin{Theorem}{}{}
+\textsc{SubsetSum} is \textsc{NP}-complete. 
+\end{Theorem}
+\begin{proof}
+Again it is very easy to see that $\textsc{SubsetSum}\in\textsc{NP}$. Like \textsc{IndSet} for this problem we will show a reduction from \textsc{3SAT}. Let we are given a boolean formula $\phi$ with $n$ variables and $m$ clauses.
+
+Now each $s_i$, $T$ are given by $n+m$ long integer. First $n$ positions are indexed by variables and last $m$ positions are indexed by the clauses. Each variable $x_i$ corresponds to $2$ integers, $s_{x_i}$ and $s_{\ovx_i}$, one for each literal. For each literal $x_i$,  $s_{x_i}$ defined as the number which has $1$ at the position of corresponding variable and $1$'s at the position of clauses in which that literal is present. Now each clause $c_i$ corresponds to $2$ integers, $s_{c_i}$, $s_{c'_i}$. Both $s_{c_i}$, $s_{c'_i}$ has a $1$ in the corresponding clause position. Now $T$ is defined to be the integer where it has $1$'s in first $n$ positions and $3$'s in the last $m$ positions.
+
+Now notice if there is a satisfying assignment then we pick those numbers which corresponds to the literals which are set to be two. Their sum matches with the first $n$ positions of $T$. Now for the last $m$ bits we pick the necessary number of clause numbers to adjust. Similarly, if there is a subset sum then we set the corresponding literals to be true. Since the first $n$ positions of $T$ are $1$ all the variables are assigned to some value. Hence, we get \textsc{SubsetSum} is \textsc{NP}-complete. 
+\end{proof}

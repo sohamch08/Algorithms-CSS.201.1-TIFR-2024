@@ -1,0 +1,93 @@
+\newcommand{\Qed}{\begin{flushright}\qed\end{flushright}}
+\newcommand{\parinn}{\setlength{\parindent}{1cm}}
+\newcommand{\parinf}{\setlength{\parindent}{0cm}}
+\newcommand{\del}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\Del}[3]{\frac{\partial^{#1} #2}{\partial^{#1} #3}}
+\newcommand{\deld}[2]{\dfrac{\partial #1}{\partial #2}}
+\newcommand{\Deld}[3]{\dfrac{\partial^{#1} #2}{\partial^{#1} #3}}
+\newcommand{\uin}{\mathbin{\rotatebox[origin=c]{90}{$\in$}}}
+\newcommand{\usubset}{\mathbin{\rotatebox[origin=c]{90}{$\subset$}}}
+\newcommand{\lt}{\left}
+\newcommand{\rt}{\right}
+\newcommand{\exs}{\exists}
+\newcommand{\st}{\strut}
+\newcommand{\dps}[1]{\displaystyle{#1}}
+\newcommand{\la}{\langle}
+\newcommand{\ra}{\rangle}
+\newcommand{\cls}[1]{\textsc{#1}}
+\newcommand{\prb}[1]{\textsc{#1}}
+\newcommand{\comb}[2]{\left(\begin{matrix}
+		#1\\ #2
+\end{matrix}\right)}
+%\newcommand[2]{\quotient}{\faktor{#1}{#2}}
+\newcommand\quotient[2]{
+	\mathchoice
+	{% \displaystyle
+		\text{\raise1ex\hbox{$#1$}\Big/\lower1ex\hbox{$#2$}}%
+	}
+	{% \textstyle
+		#1\,/\,#2
+	}
+	{% \scriptstyle
+		#1\,/\,#2
+	}
+	{% \scriptscriptstyle  
+		#1\,/\,#2
+	}
+}
+
+\newcommand{\tensor}{\otimes}
+\newcommand{\xor}{\oplus}
+
+\newcommand{\sol}[1]{\begin{solution}#1\end{solution}}
+\newcommand{\solve}[1]{\setlength{\parindent}{0cm}\textbf{\textit{Solution: }}\setlength{\parindent}{1cm}#1 \hfill $\blacksquare$}
+\newcommand{\mat}[1]{\left[\begin{matrix}#1\end{matrix}\right]}
+\newcommand{\matr}[1]{\begin{matrix}#1\end{matrix}}
+\newcommand{\matp}[1]{\lt(\begin{matrix}#1\end{matrix}\rt)}
+\newcommand{\detmat}[1]{\lt|\begin{matrix}#1\end{matrix}\rt|}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+\newcommand{\handout}[3]{
+	\noindent
+	\begin{center}
+		\framebox{
+			\vbox{
+				\hbox to 6.5in { {\bf Complexity Theory I } \hfill Jan -- May, 2023 }
+				\vspace{4mm}
+				\hbox to 6.5in { {\Large \hfill #1  \hfill} }
+				\vspace{2mm}
+				\hbox to 6.5in { {\em #2 \hfill #3} }
+			}
+		}
+	\end{center}
+	\vspace*{4mm}
+}
+
+\newcommand{\lecture}[3]{\handout{Lecture #1}{Lecturer: #2}{Scribe:	#3}}
+
+\let\marvosymLightning\Lightning
+\newcommand{\ctr}{\text{\marvosymLightning}\hspace{0.5ex}} % Requires marvosym package
+
+\newcommand{\ov}[1]{\overline{#1}}
+\newcommand{\thmref}[1]{\hyperref[th:#1]{Theorem \ref{th:#1}}}
+\newcommand{\propref}[1]{\hyperref[th:#1]{Proposition \ref{th:#1}}}
+\newcommand{\lmref}[1]{\hyperref[th:#1]{Lemma \ref{th:#1}}}
+\newcommand{\corref}[1]{\hyperref[th:#1]{Corollary \ref{th:#1}}}
+
+\newcommand{\thrmref}[1]{\hyperref[#1]{Theorem \ref{#1}}}
+\newcommand{\propnref}[1]{\hyperref[#1]{Proposition \ref{#1}}}
+\newcommand{\lemref}[1]{\hyperref[#1]{Lemma \ref{#1}}}
+\newcommand{\corrref}[1]{\hyperref[#1]{Corollary \ref{#1}}}
+
+\DeclareMathOperator{\enc}{Enc}
+\DeclareMathOperator{\res}{Res}
+\DeclareMathOperator{\spec}{Spec}
+\DeclareMathOperator{\cov}{Cov}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Rank}{rank}
+\newcommand{\Tfae}{The following are equivalent:}
+\newcommand{\tfae}{the following are equivalent:}
+\newcommand{\sparsity}{\textit{sparsity}}
+
+
+
+\newenvironment{claimwidth}{\begin{center}\begin{adjustwidth}{0.05\textwidth}{0.05\textwidth}}{\end{adjustwidth}\end{center}}

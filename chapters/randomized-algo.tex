@@ -1,0 +1,96 @@
+\chapter{Randomized Algorithm}
+Here we will study randomized algorithm for tow basic problems. Later we will discuss other randomized algorithms too in the next chapters. We will also try to derandomize an algorithm in the next chapter.
+\section{Estimated Binary Search Tree Height}
+In this section we will calculate the expected height of a tree obtained by constructing a binary tree by picking elements uniformly at random from a given array. For this we have the following simple \prb{Intersection Algorithm}
+
+\begin{algorithm}
+\KwIn{Array $A$ of $n$ elements of $[n]$ in any order.}
+\KwOut{Construct a binary tree from $A$}
+\DontPrintSemicolon\Begin{
+$S\longleftarrow A$\;
+$T\longleftarrow \emptyset$\;
+\While{$S\neq\emptyset$}{
+$u\longleftarrow\prb{Extract}(S)$\;
+Insert each element at the appropriate leaf of $T$\;
+}
+\Return{$T$}
+}
+\caption{Simple Intersection Algorithm}
+\end{algorithm}
+
+\begin{question}{}{}
+	What is the expected height of the tree obtained by this \prb{Simple Intersection Algorithm} assuming sequence of keys is uniformly random permutation of $[n]$.
+\end{question}
+
+Suppose $X_n$ be the random variable for the height of the tree obtained by the algorithm running on any permutation of $[n]$. Let $R_n$ be the random variable for the root of the tree obtained by the algorithm. Now consider the random variable $Y_n$ defined as $Y_n=2^{X_n}$. Then, if we know $R_n=i$ we have  $$X_n=1+\max\{\text{Height of left subtree, Height of right subtree}\}=1+\max\{X_{i-1}+X_{n-i}\}\implies Y_n=2\max\{Y_{n-1},Y_{n-i}\}$$Now for the case of $n=1$ $Y_1=1$  since there is only one element and for the convenience we define $Y_0=0$. Now consider the following indicator random variable $Z_{n,i}$ where $$Z_{n,i}=\begin{cases}
+	1 & \text{if $i$ is first element}\\ 0 & \text{otherwise}
+\end{cases}$$So basically $Z_{n,i}=\mathbbm{1}{\{R_n=i\}}$. Now if $i$ is the first element then $i$ the root of the tree obtained by the algorithm. Therefore we have \begin{align*}
+Y_n &=\sum\limits_{i=1}^n Z_{n,i}\lt(1+\max\{Y_{i-1},Y_{n-i}\}\rt)\\
+& \leq 2\sum\limits_{i=1}^nZ_{n,i}(Y_{i-1}+Y_{n-i}) & [\text{Using \lmref{softmax}}]
+\end{align*}
+
+\begin{lemma}{Soft Max}{softmax}
+	For any $a,b\in \bbR$, $$\max\{a,b\}\leq \log (2^a+2^b)$$
+\end{lemma}
+
+
+Therefore, we have \begin{align*}
+	\bbE[Y_n] & \leq 2\sum\limits_{i=1}^n\bbE\Big[Z_{n,i}(Y_{i-1}+ Y_{n-i})\Big]\\
+	& = 2\sum\limits_{i=1}^n\bbE[Z_{n,i}]\bbE[Y_{i-1}+ Y_{n-i}]\\
+	& = \frac2n\sum_{i=1}^n (\bbE[Y_{i-1}]+\bbE[Y_{n-i}])=\frac4n\sum_{i=0}^{n-1}\bbE[Y_i]
+\end{align*}
+
+Now to compute $\bbE[Y_n]$ we use the following lemma
+\begin{lemma}{}{}
+	$\dps{\bbE[Y_n]\leq\frac14\binom{n+3}{3}}$
+\end{lemma}
+\begin{proof}
+	We will prove this using induction on $n$. The base case is true for $n=0$. Suppose this is true for $0,\dots, n-1$. $$	\bbE[Y_n]\leq \frac4n\sum_{i=0}^{n-1}\bbE[Y_i]\leq \frac1n\sum_{i=0}^{n-1}\binom{i+3}{3}= \frac1n\binom{n+3}{4}= \frac1n\frac{(n+3)!}{4!(n-1)!}= \frac14\binom{n+3}{3}$$Hence by  mathematical induction  this is true for all $n$. 
+\end{proof}
+
+Hence, by the lemma we have $\bbE[Y_n]\leq\frac14\binom{n+3}{3}=O(n^3)$. Now by Jensen Inequality we have $$\bbE[Y_n]=\bbE[2^{X_n}]\geq 2^{\bbE[X_n]}$$Therefore $\bbE[X_n]\leq O(\log n)$. Therefore, the expected height of a binary search tree is $O(\log n)$. 
+\section{Solving 2-\prb{SAT}}
+In this section we will discuss a randomized algorithm for deciding if a $n$-variate 2-SAT boolean formula is satisfiable or not.
+
+\begin{algoprob}
+	\problemtitle{2-SAT}
+	\probleminput{2-SAT formula $\vph$ consisting of $n$ variables.}
+	\problemquestion{Given $n$-variate 2-SAT boolean formula determine if $\vph$ is satisfiable.}
+\end{algoprob}\parinf
+
+Here we give a simple randomized algorithm for solving the 2-SAT problem:\parinn\newpage
+
+\begin{algorithm}
+\KwIn{$n$ variate 2-SAT formula $\vph$}
+\KwOut{Decide if $\vph$ is satisfiable or not}
+\DontPrintSemicolon
+\Begin{
+$\forall\ i\in[n]$, Set $x_i=0$\;
+\While{$\exs$ clause $C$ that is not satisfied}{
+Let $x_i$ and $x_j$ be variables in $C$\;
+Pick from $\{x_i,x_j\}$ with equal probability and flip the assignment for that variable.
+}
+\Return{$x$}
+}
+\caption{2-SAT Randomized Algorithm}
+\end{algorithm}
+
+Now if the algorithm terminates it terminates with a satisfying assignment. For now assume that $\vph$ is satisfiable. We will deal with the case that $\vph$ is not satisfiable later. 
+
+Now since there are $n$ variables there can be at most $O(n^2)$ many clauses can be in the formula. Therefore, for each step of the while loop to occur it can at most take $O(n^2)$ time to find a clause which is not satisfied.
+
+Let $S$ represents the set of satisfying assignments for $\vph$. Let at $j^{th}$ iteration let $A_j$ denote the current assignment of the variables. Let $X_j$ be the random variable which denotes maximum number of variables of $A_j$ that matches with some satisfying assignment of $S$ i.e. $$X_j=\max\{n-|x-A_j|\colon x\in S\}$$At any step if $X_j=n$ then the algorithm terminates since the algorithm has found a satisfying assignment. Now starting with $X_j<n$ we consider how $X_j$ evolves over time and how long it takes before $X_j$ reaches $n$.
+
+Now at each step we pick a clause which is unsatisfied. So we know $A_j$ and all assignments of $S$ disagree on the value of at least one variable of this clause. If all the assignments in $S$ disagree with $A_j$ on both variables changing either one will increase $X_j$. If there are assignments in $S$ which disagree on the value of one of the two variables then with probability $\frac12$ we choose that variable and increase $X_j$ by 1 and with probability $\frac12$ we choose the other variable and decrease $X_j$ by $1$.
+
+Therefore, $X_j$ behaves like a random walk on a line starting from $0$ which denotes the worst possible case and ends once it reaches at $n$ where at any nonzero point it goes up or down by 1 with probability $\frac12$. This is a Markov Chain. We want to calculate how many steps does it take on average for $X_j$ to stumble all the way up to $n$. Before that we first properly define our Markov Chain.
+
+The Markov Chain consists states from $0 $ to $n$. Where from 0 it goes to 1 with probability 1 and from $n$ it always stays at $n$. And for any other state $i$ it goes to $i+1$ with probability $\frac12$ and goes to $i-1$ with probability $\frac12$. Now let $$T(k)=\text{Expected time to walk from $k$ to $n$}$$ Then we have $$T(n)=0,\qquad T(0)=T(1)+1, \qquad\forall\ i\in [n-1],\ T(i)=\frac{T(i-1)}{2}+\frac{T(i+1)}2+1$$Then we have $n$ unknowns and $n$ equations in the above system. Therefore, on average at most $O(n^2)$ steps needed to find a solution.
+
+Now at first we said we are assuming we are dealing with the case of there exists a solution. 
+\begin{question}{}{}
+	How to deal with the issue of no solution?
+\end{question}
+In this case we will run for more number of iterations before we give up since when we give up we me might just not have found the solution. So we will run the algorithm for $100n^2$ steps. And if no solution was found then we will give up. 
+
+We first of all divide the execution of the algorithm into segments of $2n^2$ steps each. We will calculate the failure case of each segment. If the 2-SAT formula has no solution then the algorithm gives correct output. Suppose it has a solution. Then by Markov's Inequality the probability of number of steps needed to find the solution is greater than the expected number of steps needed to find a solution is at most $\frac12$. Now after total $100n^2$ steps the probability none of the segments found a solution is $2^{-50}$.

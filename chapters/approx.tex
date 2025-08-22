@@ -1,0 +1,311 @@
+\chapter{Approximation Algorithms using LP}
+In this chapter we will study some approximation algorithms using linear programming to  get better approximation ratios of the optimal solution.
+\section{Set Cover}
+\begin{algoprob}
+	\problemtitle{$\prb{Set Cover}$}
+	\probleminput{$\mcU$: Universe of all elements $u_1,\dots, u_n$
+
+		$\mcS=\{S_1,\dots, S_m\}$, $S_i\subseteq \mcU$ forall $i\in[m]$
+
+		Function $c:\mcS\to\bbZ_0$}
+	\problemquestion{Given $\mcU,\mcS$ and the function $c$ find $T\subseteq [m]$ such that $\bigcup\limits_{i\in T}S_i=\mcU$ to minimize the total cost $c(T)=\sum\limits_{i\in T}c(S_i)$ }
+\end{algoprob}
+Since the special case of Set Cover is basically the Vertex Cover problem we discussed earlier, we know that Set Cover is $\mathsf{NP}$-hard. We will discuss \textsc{NP}-hardness in the next chapter. 
+\begin{Theorem}{}{}
+	Set Cover is $\mathsf{NP}$-hard.
+\end{Theorem}
+Since we are going to find approximate solutions using LP let's first write the linear program for Set Cover:
+\begin{mini*}
+	{}{\sum\limits_{S\in\mcS}c(S)x_S}{}{}
+	\addConstraint{\sum\limits_{S:u\in S}x_S}{\geq 1}{\quad\forall\ u\in \mcU}
+	\addConstraint{x_S}{\geq 0}{\quad\forall\ S\in \mcS}
+\end{mini*}
+
+\subsection{Frequency \texorpdfstring{$f$}{f}-Approximation Algorithm}
+Let for any element $u\in\mcU$, $f_u$ is the frequency of the element $u$ in $\mcS$ i.e. $f_u=|\{S\in\mcS\colon u\in S\}|$. Then let $f=\max\{f_u\colon u\in \mcU\}$. Then we want to find a $f$-approximation algorithm for set cover.
+\begin{question}{}{}
+	For vertex cover what is $f$?
+\end{question}
+For all $e\in E$ we have $f_e=2$ since the elements of universe corresponds to the edges and the set corresponds to vertices and each edge is contained in exactly 2 sets. So $f=2$.
+
+\begin{algorithm}\DontPrintSemicolon
+	\KwIn{$\mcU,\mcS,c$}
+	\KwOut{$T\subseteq [m]$ such that $\bigcup\limits_{i\in T}S_i=\mcU$ and $\sum\limits_{i\in T}c(S_i)$ is minimized}
+	\Begin{
+		$T\longleftarrow\emptyset$\;
+		$\hat{x}\longleftarrow 0^{|\mcS|}$\;
+		Let $x^*$ is the optimal solution of the LP for Set Cover problem\;
+		\For{$S_i\in \mcS$}{
+			\If{$x^*_{S_i}\geq \frac1f$}{
+				$T\longleftarrow T\cup\{i\}$\;
+				$\hat{x}_{S_i}\longleftarrow 1$
+			}
+		}
+		\Return{$T$}
+	}
+	\caption{$f$-Approximate Algorithm}
+\end{algorithm}
+\begin{lemma}{}{}
+	$\hat{x}$ is a feasible solution.
+\end{lemma}
+\begin{proof}
+	For all $e\in \mcU$ there are at most $f$ sets containing $e$. Thus, at most $f$ terms in the summation in $LHS$ of the first constraint for each $e\in \mcU$ Thus in $x^*$ at least one such term is $\geq \frac1f$.
+\end{proof}
+\begin{lemma}{}{}
+	$\sum\limits_{S\in \mcS}c(S)\hat{x}_S\leq f\cdot \sum\limits_{S\in\mcS}c(S)x^*_S$
+\end{lemma}
+\begin{proof}
+	In $\hat{x}$ if $\hat{x}_S=1$ that means $x^*_S\geq \frac1f$. Therefore, we have the lemma.
+\end{proof}
+
+Hence, with this algorithm we can get a $f$-approximation for Set Cover problem. In the next subsection we will see a new way of getting the same approximation ratio.
+
+\subsection{Frequency \texorpdfstring{$f$}{f}-Approximation Algorithm through Dual Fitting}
+First let's write the dual of the LP for Set Cover problem:
+\begin{center}
+	\begin{minipage}{0.35\textwidth}
+		\begin{mini*}
+			{}{\sum\limits_{S\in\mcS}c(S)x_S}{}{}
+			\addConstraint{\sum\limits_{S:u\in S}x_S}{\geq 1}{\quad\forall\ u\in \mcU}
+			\addConstraint{x_S}{\geq 0}{\quad\forall\ S\in \mcS}
+		\end{mini*}
+		\begin{center}
+			$\boxed{\text{Primal}}$\vspace*{2mm}
+
+            ``Covering Problem''
+		\end{center}
+	\end{minipage}	$\iff$\begin{minipage}{0.35\textwidth}
+		\begin{maxi*}
+			{}{\sum\limits_{u\in\mcU}y_u}{}{}
+			\addConstraint{\sum\limits_{u\in S}y_u}{\leq c(S)}{\quad\forall\ S\in\mcS}
+			\addConstraint{y_u}{\geq 0}{\quad\forall\ u\in \mcU}
+		\end{maxi*}
+		\begin{center}
+			$\boxed{\text{Dual}}$\vspace*{2mm}
+
+            ``Packing Problem''
+		\end{center}
+	\end{minipage}
+\end{center}
+Both the primal and dual are feasible. Let $x,y$ are feasible solutions of the primal and dual respectively. Then by \hyperref[th:weak-duality]{Weak Duality} we have $$\sum\limits_{S\in \mcS}c(S)x_S\geq \sum\limits_{u\in \mcU}y_u$$Let $x^*,y^*$ are the optimal solutions of primal and dual respectively. Then by \hyperref[th:complementary-slackness]{Complementary Slackness} $$x_S^*>0\implies \sum\limits_{u\in S}y_u^*=c(S),\qquad y_u^*>0\implies \sum\limits_{S:u\in S}x_S^*=1$$
+\begin{Theorem}{Relaxed Complementary Slackness}{relaxed-cs}
+    Suppose $x,y$ are feasible solutions of the primal and dual respectively  and they satisfy the following conditions:
+    \begin{enumerate}
+        \item If $x_j>0$ then $\frac1{\alpha}\cdot c_j\leq  {A^j}^Ty\leq c_j$ where $\alpha\geq 1$.
+        \item If $y_i>0$ then $ b_i\leq A_i^Tx\leq \beta\cdot b_i$ where $\beta\geq 1$.
+    \end{enumerate}Then $$c^Tx\leq \alpha\beta\cdot b^Ty\leq \alpha\beta\cdot c^Tx^*=\alpha\beta\cdot \operatorname{OPT}$$
+\end{Theorem} 
+\begin{proof}
+	$x,y$ are the feasible solutions of the primal and dual respectively. Then we have \begin{align*}
+        c^Tx & =\sum\limits_{j=1}^m c_jx_j \leq\sum_{j=1}^m \lt(\alpha {A^j}^Ty\rt)x_j= \alpha\sum_{j=1}^m\sum_{i=1}^n A_{ij}y_ix_j = \alpha\sum_{i=1}^n \lt(\sum_{i=1}^m A_{ij}x_j\rt)y_i \leq \alpha\sum\limits_{i=1}^m\beta\cdot b_iy_i=\alpha\beta\cdot b^Ty  
+    \end{align*}
+    Hence we have $c^Tx\leq \alpha\beta\cdot b^Ty\leq \alpha\beta\cdot c^Tx^*=\alpha\beta\cdot \operatorname{OPT}$.
+\end{proof}
+
+To show a $f$-approximation algorithm for set cover we will first find  feasible solutions of primal, dual, $x,y$  which satisfies:\begin{enumerate}
+    \item $x$ is integral.
+    \item $x$ satisfies the first condition of \hyperref[th:relaxed-cs]{Relaxed Complementary Slackness} with $\alpha=f$.
+\end{enumerate}
+
+\begin{algorithm}
+\DontPrintSemicolon
+    \KwIn{$\mcU,\mcS,c$}
+    \KwOut{$T\subseteq [m]$ such that $\bigcup\limits_{i\in T}S_i=\mcU$ and $\sum\limits_{i\in T}c(S_i)$ is minimized}
+    \Begin{
+        Initialize $\mcU'\longleftarrow\mcU$, $C\longleftarrow\emptyset$\;
+        \While{$\exs\ u\in\mcU'$}{
+            Increase $y_u$  until for some $S\in\mcS$ with $u\in S$ we have $\sum\limits_{u'\in S}y_{u'}=c(S)$\;
+            $C\longleftarrow C\cup \lt\{S\in\mcS\colon \sum\limits_{u\in S}y_u=c(S)\rt\}$\;
+            \For{$S\in C$}{
+                $\mcU'\longleftarrow \mcU'\setminus S$\;
+            }
+        }
+    \Return{$C$}
+    }
+    \caption{Dual Fitting Algorithm for Set Cover}
+\end{algorithm}
+
+From $C$ we con construct $x$ by $x_S=1$ if $S\in C$ and otherwise $x_S=0$ for all $S\notin C$. Now we have the observations:
+\begin{observation*}After the algorithm terminates we have:
+    \begin{enumerate}
+        \item At the beginning of the loop if $u\in\mcU$, $y_u=0$.
+        \item If $x_S=1$ and $u\in S$ then $y_u$ is not increased.
+        \item $x\in\{0,1\}^{|\mcS|}$ is integral.
+    \end{enumerate}
+\end{observation*}
+\begin{lemma}{}{}
+    \begin{enumerate}
+        \item $x$ is feasible at the end of the algorithm.
+        \item $y$ is feasible at every iteration of the while loop
+    \end{enumerate}
+\end{lemma}
+\begin{proof}
+    The algorithm terminates when $\mcU'=\emptyset$. That means all the elements of the universe are covered. Hence, the set $C$ output after the algorithm terminates is indeed a set cover. Hence, $x$ is a feasible solution.
+
+    At the start of the algorithm $y=0^{|\mcU|}$. Hence, $y$ is feasible. Now suppose at any iteration $y$ is feasible. If the algorithm goes through another iteration then there exists an element in $\mcU'$ which is not covered. Let $u\in\mcU'$ which is not covered. Hence, $y_u=0$. Since in the previous iteration $y$ was feasible we have $\sum\limits_{S:u\in S}y_u\leq c(S)$. Now we increase $y_u$ to the point we achieve the equality $\sum\limits_{u'\in S}y_{u'}=c(S)$ for all $S\in\mcS$ with $u\in S$. Therefore, even after updating $y_u$ all the constraints of dual are satisfied. Hence, $y$ is a feasible solution after another iteration of the while loop. Therefore, $y$ is feasible at every iteration of the while loop.
+\end{proof}
+
+\begin{lemma}{}{}
+    $x,y$ satisfy the \hyperref[th:relaxed-cs]{Relaxed Complementary Slackness} conditions.
+\end{lemma}
+\begin{proof}
+    If for any $S\in\mcS$, $x_S>0$ then we have $\sum\limits_{u\in S}y_u=c(S)$ by the construction of $C$ in the algorithm. Therefore, $$x_S>0\implies \sum\limits_{u\in S}y_u=c(S)$$Hence $\alpha=1$.
+
+    Now let for some $u\in\mcU$, $y_u>0$. Since $f$ is the maximum frequency of any element of the universe we have $f\geq \sum\limits_{S:u\in S}x_S\geq 1$. Therefore, $$y_u>0\implies f\geq \sum\limits_{S:u\in S}x_S\geq 1$$Hence $\beta=f$. 
+\end{proof}
+
+Therefore, by \hyperref[th:relaxed-cs]{Relaxed Complementary Slackness} $C$ is an $f$-approximate solution for the set cover problem. But $f$-approximation is not good enough since one element can be in too many sets, and then it doesn't give a good approximation. In the next subsection we will show how to get a better approximation ratio.
+
+
+\subsection{\texorpdfstring{$O(n\log n)$}{O(nlogn)}-Approximation Algorithm through Randomized Rounding}
+Here we will show a randomized algorithm to get better approximation ratio. The idea is to use the LP we constructed earlier and then randomly select the sets with probability proportional to the value of the corresponding variable in the LP. This is known as randomized rounding.
+
+\begin{algorithm}\DontPrintSemicolon
+	\KwIn{$\mcU,\mcS,c$}
+	\KwOut{$T\subseteq [m]$ such that $\bigcup\limits_{i\in T}S_i=\mcU$ and $\sum\limits_{i\in T}c(S_i)$ is minimized}
+	\Begin{
+		$\hat{x}\longleftarrow 0^{|\mcS|}$\;
+		Let $x^*$ is the optimal solution of the LP for Set Cover problem\;
+		\For{$S\in \mcS$}{
+			Set $\hat{x}_S\longleftarrow 1$ with probability $x^*_S$.
+		}
+		\Return{$\hat{x}$}
+	}
+	\caption{$O(n\log n)$-Approximate Algorithm}
+\end{algorithm}\parinf
+
+From the construction of $\hat{x}$ we have $\bbE\lt[\sum\limits_{S\in\mcS}c(S)\hat{x}_S\rt]=\sum\limits_{S\in\mcS}c(S)x^*_S$. Now suppose we fixed an element $u\in\mcU$. Then $$\bbP[u \text{ is not covered}]=\prod\limits_{S:u\in S}\bbP[S\text{ is not selected}]=\prod\limits_{S:u\in S}(1-x^*_S)\leq \prod_{S:u\in S}e^{-x^*_S}=\exp\lt[-\sum\limits_{S:u\in S}x^*_S\rt]\leq e^{-1}$$Hence to reduce the probability of not covering an element of $\mcU$ we repeat the algorithm multiple times. Hence, we have the updated algorithm:
+\begin{algorithm}\DontPrintSemicolon
+	\KwIn{$\mcU,\mcS,c$}
+	\KwOut{$T\subseteq [m]$ such that $\bigcup\limits_{i\in T}S_i=\mcU$ and $\sum\limits_{i\in T}c(S_i)$ is minimized}
+	\Begin{
+		Let $x^*$ is the optimal solution of the LP for Set Cover problem\;
+		\For{$i\in [2\log n]$}{
+			$C_i\longleftarrow\emptyset$\;
+			\For{$S\in \mcS$}{
+				Put $S$ in $C_i$ with probability $x^*_S$.
+			}
+		}
+		$C\longleftarrow\bigcup\limits_{i=1}^{2\log n}C_i$\;
+		\Return{$C$}
+	}
+	\caption{$O(n\log n)$-Approximate Algorithm}
+\end{algorithm}\parinn
+
+Again now we fix an element $u\in \mcU$. Now we will calculate the probability that $u$ is not covered in the union of all $C_i$'s. $$\bbP[u \text{ is not covered by }C]=\bbP[u \text{ is not covered by }C_i\text{ for all }i\in [2\log n]]\leq e^{-2\log n}=\frac{1}{n^2}$$
+Hence, the probability that $e$ is covered is at least $1-\frac{1}{n^2}$. Therefore, $$\bbP[\exs\ e\in\mcU\text{ is not covered by }C]\leq \sum\limits_{u\in\mcU}\frac1{n^2}=\frac1n$$Hence, $\bbP[C\text{ is a set cover}]\geq 1-\frac1n$. Now we have to bound the cost of $C$. By Markov's inequality we have $$\bbP\lt[c(C)\geq 6\log n\sum\limits_{S\in\mcS}c(S)x^*_S\rt]\leq \frac13$$
+
+$$\bbP\lt[C\text{ is not a set cover OR cost of C}\geq 6\log n\sum\limits_{S\in\mcS}c(S)x^*_S\rt]\leq \frac1n+\frac13\leq \frac12$$Therefore $$\bbP\lt[C\text{ is  set cover AND }c(S)\leq 6\log n\sum\limits_{S\in\mcS}c(S)x^*_S\rt]\geq \frac12$$Hence with probability at least $\frac12$ we have a set cover $C$ such that $c(C)\leq 6\log n\sum\limits_{S\in\mcS}c(S)x^*_S$ which gives us an $O(\log n)$-approximation algorithm for Set Cover problem.\parinn
+
+
+\nt{$O(\log n)$-approximatiobn is also the best we can do for set cover. Doing better than that is $\mathsf{NP}$-hard.}
+
+
+\newpage
+
+\section{Makespan Minimization}
+\begin{algoprob}
+	\problemtitle{$\prb{Makespan}$}
+	\probleminput{$\mcM$: Set of $m$ machines
+
+		$\mcJ$: Set of $n$ jobs
+        
+        $P\in\bbN^{m\times n}$: Matrix where $P_{ij}$ is the time taken by machine $i$ to complete job $j$.}
+	\problemquestion{Given a set of machines $M$, set of jobs $\mcJ$ and the matrix of time taken by $i^{th}$ machine to complete $j^{th}$ job find an assignment $\sg:\mcJ\to \mcM$ of jobs to machines to minimize the  makespan $S_{\sg}=\max\{l_i\colon i\in \mcM\}$ where $l_i=\sum\limits_{j:\sg(j)=i}P_{ij}$ i.e. time taken by machine $i$ to complete all jobs assigned by $\sg$}
+\end{algoprob} 
+\begin{Theorem}{}{}
+    Makespan problem is weakly $\mathsf{NP}$-hard by reduction from subset-sum.
+\end{Theorem}
+
+\nt{Weakly $\mathsf{NP}$-hard means there exists a pseudo polynomial time algorithm i.e. if all parameters are polynomially large the algorithm can solve the problem in polynomial time.}
+\begin{Theorem}{}{}
+    It is $\mathsf{NP}$-hard to approximate within a factor of $1.5$
+\end{Theorem}
+Here we will show a $2$-approximate solution of makespan optimization. First let's construct the LP for makespan optimization.
+\subsection{LP Construction}
+We'll use the variable $x_{ij}$ as an indicator for $j^{th}$ job assigned to $i^{th}$ machine. Then here is the LP:
+\begin{mini*}
+    {}{T}{}{}
+    \addConstraint{\sum_{i\in \mcM}x_{ij} }{\geq 1}{\quad\forall\ j\in \mcJ}
+    \addConstraint{\sum_{j\in\mcJ}P_{ij}x_j}{\leq T}{\quad\forall\ i\in \mcM}
+    \addConstraint{x_{ij}}{\geq 0}{\quad\forall \ i\in\mcM,j\in\mcJ}
+\end{mini*} 
+So here the first constrain basically says that every job assigned to some machine. The second constraint says that for every machine the total time taken by the machine to complete the jobs should be at most the makespan where $T$ denotes the makespan. But this LP is not good enough. Consider the following example where there is only one job and $P_{i1}=m$ then $\operatorname{OPT}_{LP}=1$ by setting $x_{i1}=\frac1m$ where as actually the optimal makespan is $m$. Hence this LP will not work. We have to strengthen the LP.
+
+So now assume we already know the optimal makespan $T$. Then if any $P_{ij}>T$ then we know that we can't assign the $j^{th}$ job to $i^{th}$ machine. So now we have the new updated LP:
+
+\begin{mini*}
+    {}{0}{}{}
+    \addConstraint{\sum_{i\in \mcM}x_{ij} }{\geq 1}{\quad\forall\ j\in \mcJ}
+    \addConstraint{\sum_{j\in\mcJ}P_{ij}x_j}{\leq T}{\quad\forall\ i\in \mcM}
+    \addConstraint{x_{ij}}{\geq 0}{\quad\forall \ i\in\mcM,j\in\mcJ}
+	\addConstraint{x_{ij}}{=0}{\quad \text{If }P_{ij}>T,\ \forall\ i\in \mcM\ j\in\mcJ}
+\end{mini*} 
+This basically checks the feasibility for a specific $T$. Hence, now we can do a binary search over $T$'s to find the smallest feasible $T$.
+\begin{Theorem}{}{}
+	By binary search $O(\log n)$ round we can find the smallest $T$ such that $LP(T)$ is feasible.
+\end{Theorem}
+
+Now suppose we have the smallest feasible time. Let's call this $\hat{T}$. Then $\hat{T}\leq \operatorname{OPT}_I$. Let $\tdx$ is the basic feasible solution for $\hat{T}$. We will now show a polynomial time algorithm to obtain an integral assignment with makespan $=2\hat{T}$.
+
+\subsection{Rounding to Get \texorpdfstring{$2$}{2}-Approximate Solution}
+Now we have the smallest feasible time $\hat{T}$ and the basic feasible solution for that $\tdx$ which is also an extreme point. Now we can think $\tdx$ as a weighted bipartite graph between $\mcJ$ and $\mcM$ with fractional weights i.e. one job assigned to multiple machines fractionally. Let the graph is $G=(L\sqcup R,E)$ where $e=(i,j)\in E$, if $\tdx_{ij}>0$ with $w(i,j)=\tdx_{ij}$. Hence, we also have for all $(i,j)\in E$, $\tdx_{ij}\leq \hat{T}$. 
+\begin{lemma}{}{}
+	In $\tdx$ at least $n-m$ jobs are assigned integrally.
+\end{lemma}
+\begin{proof}
+	There are total $n+m+nm$ constraints in the LP. But the LP is $nm$ dimensional. Therefore at $\tdx$, $nm$ constraints are tight. So at most $m+n$ constraints of the type $x_{ij}\geq 0$ are not tight i.e.  at most $m+n$ many $\tdx_{ij}$ are not zero. Suppose $\alpha$ jobs are set integrally and $\beta $ fractionally. So for each of the $\beta $ jobs it is assigned to at least  $2$ machines. Now each of the $\tdx_{ij}$ corresponds to an edge of the graph. Therefore we have the following two equations:$$\alpha+\beta=n,\quad \alpha+2\beta\leq m+n\implies \beta\leq m\implies \alpha\geq n-m$$Therefore there at least $n-m$ jobs which are assigned integrally.
+\end{proof}
+\begin{lemma}{}{}
+	In every connected component of $G$, $\#\text{edges}\leq \#\text{vertices}$.
+\end{lemma}
+\begin{proof}
+	In the graph $G$, as we showed earlier at most $m+n$ constraints of the type $x_{ij}\geq 0$ are not tight i.e.  at most $m+n$ many $\tdx_{ij}$ are not zero. Hence $$\#\text{edges}=|\{\tdx_{ij}\mid \tdx_{ij}>0\}|\leq m+n=\#\text{vertices}$$
+
+	Suppose $C$ is a connected component. Let $\mcJ_C$, $\mcM_C$ be the jobs and machines of $C$ and $\tdx|_C$ is $\tdx$ restricted to $C$. Then $\tdx|_C$ is a basic feasible solution for the instance restricted to $\mcM_C$, $\mcJ_C$ with $\hat{T}$ being a feasible time. If $\tdx|_C$ was not feasible for $\mcM_C$ and $\mcJ_C$ then there exists $y_C$ and $z_C$ with $y_C\neq z_C$ such that $x|_C=\lm y_C+(1-\lm)z_C$ where $\lm\in(0,1)$. Then $$\tdx=\lm\lt(y_C,\tdx|_{\ovC}\rt)+(1-\lm)\lt(z_C,\tdx|_{\ovC}\rt)$$ Then $\tdx$ can not be an extreme point. And therefore by the same logic as above we have in the connected component $\#\text{edges}\leq \#\text{vertices}$. Since $C$ is arbitrary connected component this is true for every connected component.
+\end{proof}
+ 
+Now we create a feasible solution $\hat{x}$ for $2\hat{T}$. We first initiate $\hat{x}$ setting all $0$'s. We fix a connected component $C$ in $G$. Furthermore, we call a vertex in $\mcJ_C\cup \mcM_C$ leaf if it has degree $1$. If for any job $j\in \mcJ_C$ it is assigned integrally in $\tdx|_C$ then $j$ is a leaf. So we remove the node $j$ and assign the job to the machine $i\in \mcM_C$, $j$ is connected to.  This also removes the edge incident on $j$. 
+
+After doing this we still have $\#\text{edges}\leq \#\text{vertices}$ because we basically removed same number of jobs and edges from the graph. But now every job is connected to at least two machines. 
+
+If a machine $i\in\mcM_C$ is a leaf, let the edge incident on $i$ is $(i,j)$ then we remove both $i,j$ from the graph and assign the job $j$ to machine $i$ i.e. basically we set $\hat{x}_{ij}=1$. So the load added to $i^{th}$ machine is at most $\hat{T}$. We do this for every leaf machine.
+
+Now the graph has no leaves remaining. Since the graph is bipartite it is an even cycle. So find a matching of jobs to machines in the cycle and assign the jobs accordingly i.e. if $M$ is a matching and $e=(i,j)\in M$ then set $\hat{x}_{ij}=1$.\newpage
+
+So we have the following final algorithm:
+
+\begin{algorithm}
+\DontPrintSemicolon
+\KwIn{$\mcM,\mcJ,P$ where $|\mcM|=m$, $|\mcJ|=n$ and $P\in\bbZ_0^{m\times n}$}
+\KwOut{$\sg:\mcJ\to\mcM$ assignment of jobs to machines to minimize $\max\{l_i\colon i\in \mcM\}$ where $l_i=\sum\limits_{j:\sg(j)=i}P_{ij}$ i.e. time taken by machine $i$ to complete all jobs assigned by $\sg$}
+\Begin{
+	Do binary search to find the minimum feasible $T$ for the LP.\;
+	Let $\hat{T}$ is the minimum feasible time and $\tdx$ is the basic feasible solution.\;
+	Construct the weighted graph $G=(\mcM\sqcup \mcJ,E)$ where $(i,j)\in E$ if $\tdx_{ij}>0$ and $w(i,j)=\tdx_{i,j}$.\;
+	$\mcC\longleftarrow$ Connected Components of $G$.\;
+	\For{$C\in\mcC$}{
+		\While{$\exs\ j\in\mcJ_C$ such that $\deg(j)=1$}{
+			Let $(i,j)\in E$\;
+			$\sg(j)\longleftarrow i$\;
+			$\mcJ\longleftarrow\mcJ\setminus\{j\}$
+		}
+		\While{$\exs\ i\in\mcM_C$ such that $\deg(i)=1$}{
+			Let $(i,j)\in E$\;
+			$\sg(j)\longleftarrow i$\;
+			$\mcM\longleftarrow\mcM\setminus\{i\}$\;
+			$\mcJ\longleftarrow\mcJ\setminus\{j\}$
+		}
+		$M\longleftarrow$\hyperref[augmenting-bp-matching]{\textsc{BP-Maximum-Matching}}. $M$ will be a perfect matching.\;
+		\For{$e=(i,j)\in M$}{
+			$\sg(j)\longleftarrow i$\;
+		}
+	}
+	\Return{$\sg$}
+}
+\caption{Makespan $2$-Approximate Algorithm}
+\end{algorithm}
+
+This algorithm works in polynomial time since solving the LP,  constructing the weighted graph and finding the connected components can be done in polynomial time and then for every component the while loops and finding matching can also be done in polynomial time. So the algorithm is polynomial time.
+
+This algorithm gives a $2$-approximate solution because each machine $i$ is assigned the jobs it is set integrally and another job $j$ if $\tdx_{ij}>0$. 

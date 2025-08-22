@@ -1,0 +1,151 @@
+\chapter{Dynamic Programming}
+\dfnc[dynamic-prog]{Dynamic Programming}{Dynamic Programming has 3 components:\begin{enumerate}
+		\item {Optimal Substructure}: Reduce problem to smaller independent problems
+		\item {Recursion}: Use recursion to solve the problems by solving smaller independent problems
+		\item {Table Filling}: Use a table to store the result to solved smaller independent problems.
+\end{enumerate}}
+\section{Longest Increasing Subsequence}
+\begin{algoprob}
+	\problemtitle{\prb{Longest Increasing Subsequence}}
+	\probleminput{Sequence of distinct integers $A=(a_1,\dots, a_n)$}
+	\problemquestion{Given an array of distinct integers find the longest increasing subsequence i.e. return maximum size set $S\subseteq[n]$ such that $\forall\ i,j\in S$, $i<j\implies a_i<a_j$}
+\end{algoprob}
+\subsection{\texorpdfstring{$O(n^2)$}{O(n2)} Time Algorithm}
+Given $A=(a_1,\dots, a_n)$ first we will create a $n$-length array where $i^{th}$ entry stores the length and longest increasing subsequence ending at $a_i$. Certainly we have the following recursion relation$$\prb{LIS}(k)=1+\max\limits_{\substack{j<k,\  a_j<a_k}}\{\prb{LIS}(j)\}$$since if a subsequence $S\subseteq [n]$ is the longest increasing subsequence ending at $a_k$ then certainly $S-\{k\}$ is the longest increasing subsequence which ends at $a_j<a_k$ for some $j<k$. Hence, in the table we start with 1st position and using the recursion relation we fill the table from left. And after the table is filled we look for which entry of the table has maximum length. So the algorithm will be following:
+
+\begin{algorithm}[H]
+	\SetKwComment{Comment}{// }{}
+	\DontPrintSemicolon
+	\KwIn{Sequence of distinct integers $A=(a_1,\dots, a_n)$}
+	\KwOut{Maximum size set $S\subseteq [n]$ such that $\forall\ i,j\in S$, $i<j\implies a_i<a_j$.}
+	\Begin{
+	Create an array $T$ of length $n$\;
+	\For{$i\in[n]$}{
+	$T[i][1]\longleftarrow 1+\max\{T[j][1]\colon j<k,\ a_j<a_k\}$\Comment*{Finds $\prb{LIS}[i]$}
+$T[i][2]\longleftarrow T\big[T[i][1]-1\big][2]$
+}	
+$Index\longleftarrow \max \{T[j][1]\colon j\in[n]\}$\;
+\Return{$T[Index]$}
+}
+\caption{\prb{LIS}$(A)$}
+\end{algorithm}\parinf
+\textbf{Time Complexity:} For each iteration of the loop it takes $O(n)$ time to find $\prb{LIS}[i]$. Hence, the time complexity of this algorithm is $O(n^2)$. \parinn
+\subsection{\texorpdfstring{$O(n\log n)$}{O(logn)} Time Algorithm}
+In the following algorithm we update the longest increasing sequence every time we see a new element of the given sequence. At any time we keep the best available sequence.
+\begin{idea*}
+	We can make an increasing subsequence longer by picking the smallest number for position $k$ so that there is an increasing subsequence of length $k$. Doing this we can maximize the length of the subsequence. 
+\end{idea*}
+
+\begin{Theorem}{}{}
+	If $S\subseteq A$ is the longest increasing subsequence of length $t$ then for any $k\in[t]$ the number $S(k)$ is the smallest number in the subarray of $A$ starting at first  and ending at $S(k)$ such that there is an increasing subsequence of length $k$ ending at $S(k)$.
+\end{Theorem}
+\begin{proof}
+	Assume the contrary. Suppose $\exs\ k\in[t]$ such that $k$ is the smallest number in $[t]$ such that $S(k)$ is not the smallest number to satisfy the condition. Now denote the subarray of $A$ starting at first  and ending at $S(k)$ by $A_k$. Now let $x\in A_k$ be the smallest number in $A_k$ such that there is an increasing subsequence of length $k$ ending at $x$. Certainly $x<S(k)$ by our assumption. Now since $k$ is the smallest index which does not satisfy the given condition, $\forall\ j\in[k-1]$, $S(j)$ is the smallest number in $A_j$ such that there is an increasing subsequence of length $j$ ending at $S(j)$. Then consider the subsequence $\{S(1),\dots, S(k-1),x,S(k),S(k+1),\dots, S(t)\}$. This is an increasing subsequence of $A$ and has length $t+1$. But this contradicts the minimality of $S$. Hence, contradiction \ctr Every element of $S$ follows the given condition. 
+\end{proof}
+
+So we will construct an increasing subsequence by gradually where each step this property is followed, i.e. at each step we will ensure that the sequence built at some time have the above property. So now we describe the algorithm. 
+\begin{algorithm}\SetKwComment{Comment}{// }{}
+	\DontPrintSemicolon
+	\KwIn{Sequence of distinct integers $A=(a_1,\dots, a_n)$}	
+	\KwOut{Maximum size set $S\subseteq [n]$ such that $\forall\ i,j\in S$, $i<j\implies a_i<a_j$.}
+\Begin{
+	Create an array $T$ of length $n$ with all entries $0$\;
+	Create an array $M$ of length $n$\;
+	\For{$i=1,\dots, n$}{$M[i]\longleftarrow \infty$}	
+	\For{$i=1,\dots,n$}{
+		$k\longleftarrow $Find the smallest index such that $M[k]\geq a_i$ using \prb{Binary-Search}\;
+		$M[k]\longleftarrow a_i$\;
+		$T[i]\longleftarrow M[k-1]$\Comment*{Pointer to the previous element of the sequence}
+}
+$l\longleftarrow $ Largest $l$ such that $M[l]$ is finite\;
+Create an array $S$ of length $l$\;
+\For{$i=l,\dots, 1$}{
+	\If{$i=l$}{$S[l]\longleftarrow M[l]$\;
+	Continue}
+$S[i]\longleftarrow T\big[S[i+1]\big]$\Comment*{$T[S[i+1]]$ is pointer to previous value of sequence}
+}
+\Return{$(l,S)$}
+}
+\caption{\prb{QuickLIS}$(A)$}
+\end{algorithm}\parinf
+
+\textbf{Time Complexity:} To create the arrays and the first for loop takes $O(n)$ time. In each iteration of the for loop at line 6 it takes $O(\log n)$ time to find $k$ and rest of the operations in the loop takes constant time. So the for loop takes $O(n\log n)$ time.  Then To find $l$ and creating $S$ it takes $O(n)$ time. Then in the for loop at line 12 in each iteration it takes constant time. So the for loop at line 12 takes in total $O(n)$ time. Therefore, the algorithm takes $O(n\log n)$ time. \parinn
+
+We will do the proof of correctness of the algorithm now.
+\begin{lemma}{}{mdecreasing}
+	For any index $M[k]$ is non-increasing
+\end{lemma}
+\begin{proof}
+	Every time we change a value of $M[k]$ we replace by something smaller. So $M[k]$ is non-increasing.
+\end{proof}
+We denote the state of array $M$ at $i^{th}$ iteration by $M^i$. Then we have the following lemma:
+
+\begin{lemma}{}{}
+At any time $i$, $M^i[1]< M^i[2]< \cdots< M^i[n]$
+\end{lemma}
+\begin{proof}
+We will prove this by induction on $i$. The base case follows naturally. Now for $i^{th}$ iteration suppose $M^{i-1}[k]$ is replaced by $x_i$. Then we know $\forall \ j<k$ we have $M^i[j]< x_i$. By inductive hypothesis at time $t-1$ we have $M$ as an increasing sequence. Now before replacing $M^{i-1}[k]< M^{i-1}[k+1]< \cdots M^{i-1}[n]$. Now by \lemref{th:mdecreasing} $M^{i-1}[k]$ is nonincreasing. So we still have $M^{i-1}[1]< \cdots M^{i-1}[k-1]< x_i < M^{i-1}[k+1]< \cdots < M^{i-1}[n]$. Therefore, $M^{i}$ is an increasing subsequence. Hence, but mathematical induction it holds.
+\end{proof}
+
+Now suppose at $i^{th}$ iteration $k_i$ is largest such that $M^i[k_i]<\infty$. Then $S^i$ denote the set constructed like the way we constructed at line 12--16 in the algorithm i.e. $$S^i[k_i]=M^i[k_i]\qquad \text{and}\qquad S^i[j]=T[S^i[j+1]]\quad \forall\ j\in[k_i-1]$$
+\begin{lemma}{}{si-isgoodatalliterations}
+	After any $i^{th}$ iteration, for $k\in[n]$ if $M^i[k]<\infty$ then $S^i[k]$ stores the smallest value in $x_1,\dots, x_i$ such that there is an increasing subsequence of size $k$ that ends in $S^i[k]$.
+\end{lemma}
+\begin{proof}
+We will use induction on $i$. Base case: This is true after first iteration since only $M^1[1]<\infty$. So this naturally follows. 
+
+Suppose this is true after $i$ iterations.  Now at $(i+1)^{th}$ iteration suppose $t$ be the smallest index such that $M^i[t]>x_{i+1}$. Then we have $$M^i[1]<\cdots< M^i[t-1]<x_{i+1}\leq M^i[t]<\cdots< M^i[n]\implies S^i[1]<\cdots< S^i[t-1]<x_{i+1}\leq S^i[t],\dots, S^i[k_i]$$ Now for $k\leq t-1$ it is true by the inductive hypothesis. For $k>t$ and if $M^{i+1}[k]<\infty$ then $S^{i+1}[k]$ is the smallest value in $x_1,\dots, x_{i+1}$ such that there is an increasing subsequence of size $k$ that ends in $S^{i+1}[k]$ since this was true for $i^{th}$ iteration. 
+
+Now only the case when $k=t$ is remaining. If $S^{i+1}[k]$ does not store the smallest value in $x_1,\dots ,x_{i+1}$ to have an increasing subsequence of size $k$ ending at $S^{i+1}[k]$ then let $x_j$ was the smallest value to satisfy this condition where $j<i+1$. Then naturally $x_j<x_{i+1}$. Then $M^{i}[t]\leq x_j<x_{i+1}$. But we $t$ was the smallest number such that $M^{i}[t]\geq x_{i+1}$. Hence, contradiction. Therefore, $S^i[k]$ is the smallest value in $x_1,\dots, x_{i+1}$ to have an increasing subsequence of size $k$ ending at $S^{i+1}[k]$.  Therefore, by mathematical induction this is true for all iterations. 
+\end{proof}
+\begin{Theorem}{}{}
+	$S$ is the longest increasing subsequence of $A$.
+\end{Theorem}
+\begin{proof}
+	After the $n^{th}$ iteration $S^n=S$ and $k_n=l$. Hence by \lemref{th:si-isgoodatalliterations} we can say for all $k\in[l]$, $S[k]$ is the smallest number such that there is an increasing sequence of length $k$ ending at $S[k]$. Now we want to show that this increasing sequence is the longest increasing subsequence of $A$. Suppose $S$ is not the longest increasing subsequence. Let $T$ be the longest increasing subsequence of length $t>l$. Then suppose $j\leq l$ be the smallest index such that $S[j]\neq T[j]$. Now $S[j]$ is the smallest number in $x_1,\dots, x_n$ such that there is an increasing subsequence of length $j$ ending at $S[j]$. Hence, we have $S[j]<T[j]$. Now for all $i<j$ we have $S[i]=T[i]$.   Then we form this new subsequence $\hat{T}=\{T[1],T[2],\dots, T[j-1], S[j],T[j],\dots, T[t]\}$. Certainly $\hat{T}$ has length $t+1$ and it is also an increasing subsequence. But this contradicts the maximal condition of $T$. Hence, $S$ is indeed the longest increasing subsequence.
+\end{proof}
+
+\section{Optimal Binary Search Tree}
+\begin{algoprob}
+	\problemtitle{Optimal BST}
+	\probleminput{A sorted array $A=(a_1,\dots, a_n)$ of search keys and an array of their probability distributions $P=(p(a_1),\dots, p(a_n))$}
+	\problemquestion{Given array of keys $A$ and their probabilities the probability of accessing $a_i$ is $p(a_i)$ then return a binary tree  with the minimum cost where for any binary tree $T$, $\prb{Cost}(T)=\sum\limits_{i=1}^np(a_i)\cdot height\st_T(a_i)$.}
+\end{algoprob}
+
+So let $T$ be the optimal binary search tree with $a_k$ as its root for some $k\in[n]$. Let $T_l$ and $T_r$ denote the tree rooted at the left child and right child of $a_k$ in $T$ respectively. Then: \begin{align*}
+	\prb{Cost}(T) & = p_k+ {\sum_{i<k}p_i\lt(1+height\st_{T_l}(a_i)\rt)}+{\sum_{i>k}p_i\lt(1+height\st_{T_r}(a_i)\rt)} = \sum_{i=1}^n p_i+\underbrace{\sum_{i<k}p_i \cdot height\st_{T_l}(a_i)}_{\prb{Cost}(T_l)}+\underbrace{\sum_{i>k}p_i \cdot height\st_{T_l}(a_i)}_{\prb{Cost}(T_r)}
+\end{align*}
+In general we will use the notation $\prb{OPTCost}(i,k)=\prb{Cost}(T_i^k)$ where $T_i^k$ is the optimal binary tree of the subarray $A[i\dots k]$ for any $i\leq k\leq n$.  Therefore, we arrive at the following recurrence relation $$\prb{OPTCost}(i,k)=\begin{cases}
+	0&\text{when $i>k$}\\
+	\sum\limits_{j=i}^k p(a_j)+\min\limits_{i\leq r\leq k}\{\prb{OPTCost}(i,r-1)+\prb{OPTCost}(r+1,k)\} & \text{otherwise}
+\end{cases}$$
+So the algorithm for constructing the optimal binary search tree is following:
+\begin{algorithm}
+\SetKwComment{Comment}{// }{}
+\DontPrintSemicolon
+\caption{\prb{OptimalBST}$(A,P)$}
+\KwIn{A sorted array $A=(a_1,\dots, a_n)$ of search keys and an array of their probability distributions $P=(p(a_1),\dots, p(a_n))$}
+\KwOut{Binary Tree $T$ with the minimum search cost, $\prb{Cost}(T)=\sum\limits_{i=1}^np(a_i)\cdot height\st_T(a_i)$}
+\Begin{
+	\For{$i=1,\dots, n$}{$\prb{OPTCost}[i,i]\longleftarrow (p(a_i),a_i)$, 
+	$\prb{OPTCost}[0,i]\longleftarrow (0,None)$
+}	
+	\For{$d=2,\dots, n$}{
+		\For{$i\in[n+1-d]$}{
+			$minval\longleftarrow 0$ \;
+			\For{$k=i+1,\dots, i+d-2$}{
+				$newval\longleftarrow \prb{OPTCost}[i,k-1][1]+\prb{OPTCost}[k+1,i+d-1][1]$\;
+				\If{$minval>newval$}{$minval\longleftarrow newval$\;
+				$Index\longleftarrow k$}
+			}
+			$\prb{OPTCost}[i,i+d-1]\longleftarrow \lt(minval+\sum\limits_{k=1}^{i+d-1}p(a_k), k\rt)$\;
+			$a_k.left\longleftarrow \prb{OPTCost}[i,k-1][2]$\;
+			$a_k.right\longleftarrow \prb{OPTCost}[k+1,i+d-1][2]$
+					
+	}
+}
+\Return{\prb{OPTCost}$[1,n]$}
+}
+\end{algorithm}\parinf
+
+\textbf{Time Complexity:} To two for loops at line 4 and line 5 takes $O(n^2)$ many iterations. Now the innermost for loop at line 7 runs $O(n)$ iterations where in each iteration it takes constant runtime. So the total running time of the algorithm is $O(n^3)$.

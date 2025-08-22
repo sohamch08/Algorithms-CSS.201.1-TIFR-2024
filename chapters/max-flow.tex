@@ -1,0 +1,529 @@
+\chapter{Maximum Flow}\label{max-flow}
+\section{Flow}
+Suppose we are given a directed graph $G=(V,E)$ with a source vertex $s$ and a target vertex $t$. And additionally for every edge $e\in E$ we are given a number $c_e\in \bbZ_0$ which is called the capacity of the edge.
+\begin{Definition}{Flow}{flow}
+	An $s-t$ flow is a function $f:E\to\bbR_0$ which satisfies the following:\begin{enumerate}[label=\protect\circled{\small\arabic*}]
+		\item $\forall\ e\in E$, $f(e)\leq c_e$
+		\item $\forall\ v\in V\setminus\{s,t\}$, $\sum\limits_{e\in \emph{in}(v)}f(e)=\sum\limits_{e\in \emph{out}(v)}f(e)$
+	\end{enumerate}
+	Also the value of a flow $f$ is denoted by $|f|\coloneqq \sum\limits_{e\in \emph{out}(s)}f(e)$.
+\end{Definition}Before proceeding into the setup and the problem first we will assume some things
+\begin{assumption*}
+	\begin{itemize}
+		\item $\emph{in}(s)=\emptyset$ i.e. there is no edge into $s$.
+		\item $\emph{out}(t)=\emptyset$ i.e. there is no edge out of $t$.
+		\item There are no parallel edges
+	\end{itemize}
+\end{assumption*}
+\begin{lemma}{}{}
+	For any flow $f$, $|f|=\sum\limits_{e\in \emph{in}(t)}f(e)$
+\end{lemma}
+\begin{proof}
+	We have for every edge $e\in E$, $\exs\ v\in V$ such that $e\in \emph{in}(v)$ and $\exs\ u\in V$ such that $e\in \emph{out}(u)$. Hence, we get $$\sum_{e\in E}f(e)=\sum_{v\in V}\sum_{e\in\emph{in}(v)}f(e)=\sum_{v\in V}\sum_{e\in\emph{out}(v)}f(e)\implies \sum_{v\in V}\lt[\sum_{e\in\emph{in}(v)}f(e)-\sum_{e\in\emph{out}(v)}f(e)\rt]=0$$
+	Now we know $\forall\ v\in V\setminus\{s,t\}$. $\sum\limits_{e\in\emph{in}(v)}f(e)=\sum\limits_{e\in\emph{out}(v)}f(e)$. Therefore, we get $$ \sum_{v\in V}\lt[\sum_{e\in\emph{in}(v)}f(e)-\sum_{e\in\emph{out}(v)}f(e)\rt]=0\implies \sum_{v\in \{s,t\}}\lt[\sum_{e\in\emph{in}(v)}f(e)-\sum_{e\in\emph{out}(v)}f(e)\rt]=0\implies \sum\limits_{e\in \emph{out}(s)}f(e)-\sum\limits_{e\in \emph{in}(t)}f(e)$$Hence, we have $|f|=\sum\limits_{e\in \emph{in}(t)}f(e)$.
+\end{proof}
+
+\begin{algoprob}
+	\problemtitle{Max Flow}
+	\probleminput{A directed graph $G=(V,E)$ with source vertex $s$ and target vertex $t$ and for all edge $e\in E$ capacity of the edge $c_e\in\bbZ_0$}
+	\problemquestion{Given such a graph and its capacities find an $s-t$ flow which has the maximum value}
+\end{algoprob}
+
+\begin{Example}{}{}
+	Consider the following directed graph with capacities: $V=\{s,t,u,v\},\quad c_{s,u}=2,c_{s,v}=c_{u,t}=c_{v,t}=c_{u,v}=1$. Firstly the following function: $f':f'(s,u)=2=f(u,t)$. It is not a flow since $f(u,t)=2>1=c_{u,t}$. Now we define three different flow functions:
+	\begin{center}
+		\begin{tikzpicture}[scale=1.5]
+			% Draw vertices with circles around them
+			\begin{scope}[shift={(-5,0)}]
+				\node[draw, circle] (A) at (0, 0) {$s$};
+				\node[draw, circle] (B) at (2, 1) {$u$};
+				\node[draw, circle] (C) at (2, -1) {$v$};
+				\node[draw, circle] (D) at (4, 0) {$t$};
+
+				% Draw directed edges with values and reduced bends
+				\draw[,-latex, bend left=15] (A) to node[below] {2} (B);
+				\draw[,-latex, bend left=15] (B) to node[below] {1} (D);
+				\draw[,-latex] (B) -- node[left] {1} (C);
+				\draw[,-latex, bend right=15] (A) to node[above] {1} (C);
+				\draw[,-latex, bend right=15] (C) to node[above] {1} (D);
+
+
+				% Draw a single continuous red path from A to B to C to D
+				\draw[red!80!black, thick, ,-latex, rounded corners=5pt]
+				($(A) + (0.1, 0.4)$) to [bend left=15] node[above] {1} ($(B) + (-0.4, 0.2)$)
+				-- node[left] {1} ($(C) + (-0.4, -0.35)$) to [bend right=18] node[below] {1}($(D) + (-0.2, -0.5)$);
+				\draw[blue, thick, ,-latex, rounded corners=12pt, bend left=70] ($(A) + (0, 0.6)$) to node[above, xshift=-2.5cm, yshift=-0.85cm]{1} node[above, xshift=2.5cm, yshift=-0.85cm] {1}($(D) + (-0, 0.6)$);
+				\draw[blue, thick, ,-latex, rounded corners=12pt, bend right=70] ($(A) + (0, -0.6)$) to node[below, xshift=-2.5cm, yshift=0.85cm]{1} node[below, xshift=2.5cm, yshift=0.85cm]{1} ($(D) + (0, -0.6)$);
+				\draw[green!60!black, thick, rounded corners=12pt, bend left=23] ($(A) + (0.5, 0)$) to node[below]{2} ($(B) + (0.2,-0.39)$);
+				\draw[green!60!black, thick,,-latex, rounded corners=12pt, bend left=17]  ($(B) + (0.2,-0.39)$)  to node[below]{1} ($(D) + (-0.5,0)$)  ;
+				\draw[green!60!black, thick, rounded corners=5pt,-latex]  ($(B) + (0.2,-0.39)$)  to  node[right]{1}($(C) + (0.2,0.35)$)  to [bend right=23] node[above]{1} ($(D) + (-0.5,0)$);
+
+			\end{scope}
+			\begin{scope}[shift={(1.5,0)}]
+				\draw (1,0) node[text width=8cm]{\begin{itemize}
+						\item \textcolor{red!80!black}{$f\colon f(s,u)=f(u,v)=f(v,t)=1$ and otherwise $0$. Therefore, $|f|=1$}
+						\item \textcolor{blue}{$g\colon g(s,u)=g(u,t)=1$, $g(s,v)=g(v,t)=1$ and otherwise $0$. Therefore, $|g|=2$}
+						\item \textcolor{green!50!black}{$h\colon h(s,u)=2$, $h(u,t)=h(u,v)=h(v,t)=1$ and otherwise $0$. Therefore, $|h|=2$}
+					\end{itemize}\vspace*{5mm}
+
+					Notice here $g$ and $h$ has the maximum flow value since $\sum\limits_{e\in \emph{in}(t)} c_e=2$};
+			\end{scope}
+		\end{tikzpicture}
+	\end{center}
+\end{Example}
+
+
+\section{Ford-Fulkerson Algorithm}
+\begin{Definition}{Residual Graph}{}
+	Given a directed graph $G=(V,E)$ and capacities $C_e$ for all $e\in E$ and an $s-t$ flow $f$ the residual graph $G_f=(V,E_f)$ has the edges with the following properties:
+	\begin{enumerate}[label=\protect\circled{\arabic*}]
+		\item If $(u,v)\in E$ and $f(u,v)>0$  then $(v,u)\in E_f$ and $c_f(u,v)=f(u,v)$. Such an edge is called a \emph{backward} edge.
+		\item If $(u,v)\in E$ and $f(u,v)<c_{u,v}$ then $(u,v)\in E_f$ and $c_f(u,v)=c_{u,v}-f(u,v)$. It is called \emph{forward} edge.
+	\end{enumerate}
+\end{Definition}
+
+\begin{algorithm}\label{ford-fulkerson}
+	\DontPrintSemicolon
+	\SetKwComment{Comment}{//}{}
+	\KwIn{Directed graph $G=(V,E)$, source $s$, target $t$ and edge capacities $C_e$ for all $e\in E$}
+	\KwOut{Flow $f$ with maximum value}
+	\Begin{
+		\For{$e\in E$}{$f(e)=0$}
+		\While{$\exs\ s\rightsquigarrow t$ path $P$ in $G_f$}{
+			$\dl\longleftarrow \min\limits_{e\in P}\{c_f(e)\}$
+			\For{$e=(u,v)\in P$}{
+				\If{$e$ is Forward Edge}{$f(u,v)\longleftarrow f(u,v)+\dl$}
+				\Else{$f(v,u)\longleftarrow f(v,u)-\dl$}
+			}
+		}
+	}
+	\caption{\prb{Ford-Fulkerson}}
+\end{algorithm}
+We call one iteration of the While loop at line 4 \emph{Flow Augmentation}.
+%\begin{note}
+%	In each flow augmentation some edge will disappear. This is because the 
+%\end{note}
+\begin{lemma}{}{flowaugment}
+	At any iteration the $f'$ obtained after the flow augmentation of the flow $f$ is a valid flow
+\end{lemma}
+\begin{proof}
+	At any iteration  let $P$ be the path from $s\rightsquigarrow t$ in the residue graph $G_f$ and $\dl=\min\limits_{e\in P}c_f(e)$. Let $f'$ be the new function such that for each $(u,v)\in P$ if $(u,v)$ is forward edge in $G_f$ then $f'(u,v)=f(u,v)+\dl$ and if $(u,v)$ is backward edge in $G_f$ then $f'(v,u)=f(v,u)-\dl$ and for other edges $e\in E\setminus P$, $f'(e)=f(e)$.
+
+	Now since $\dl=\min\limits_{e\in P}c_f(e)$, $c_f(e)\geq \dl$ for all $e\in P$. Hence, if $(u,v)$ is backward edge then $(v,u)\in E$ and $c_f(u,v)=f(u,v)$. Hence, $f'(v,u)=f(v,u)-\dl\geq 0$. Therefore, for all $e\in E$, $f'(e)\geq 0$.
+
+	Now first we will show $f'(e)\leq c_e$ for all $e\in E$. If $(u,v)\in P$ is a forward edge then $(u,v)\in E$ and $c_f(u,v)=c_{u,v}-f(u,v)$. Therefore, $f'(u,v)=f(u,v)+\dl\leq f(u,v)+c_{u,v}-f(u,v)=c_{u,v}$. Now if $(u,v)\in P$ is a backward edge then $(v,u)\in E$ and $c_f(u,v)=f(u,v)$. Therefore, $f'(v,u)=f(v,u)-\dl\leq f(v,u)\leq c_{v,u}$. For other edges $e\in E\setminus P$, $f'(e)=f(e)\leq c_e$. Therefore, $f'(e)\leq c_e$ for all $e\in E$
+
+	Now we will prove for all $v\in V\setminus\{s,t\}$, $\sum\limits_{e\in \emph{in}(v)}f'(e)=\sum\limits_{e\in\emph{out}(v)}f'(e)$. If $v$ is not in the path $P$ in $G_f$ then, $f'(e)=f(e)$ for all edges $e\in \emph{in}(v)\cup \emph{out}(v)$. Hence, the condition is satisfied for such vertices. Suppose $v$ is in the path $P$. Then there are two edges $e_1(v)$ and $e_2$ in $P$ which are incident on $v$. If both are forward edges or both are backward edges then one of them is in $\emph{in}(v)$ and other one is in $\emph{out}(v)$. If $e_i$ is backward edge then we will denote it by $e_i$ too. Now WLOG suppose $e_1\in \emph{in}(v)$ and $e_2\in\emph{out}(v)$ we have 
+	$$\sum\limits_{e\in \emph{in}(v)}f'(e)=f(e_1)\pm \dl+\sum\limits_{e\in \emph{in}(v)\setminus\{e_1\}}f(e)=f(e_2)\pm \dl+\sum\limits_{e\in\emph{out}(v)\setminus \{e_2\}}f(e)=\sum\limits_{e\in\emph{out}(v)}f'(e)$$
+	If one of $e_1$, $e_2$ is forward edge and other one is backward edge then either $e_1,e_2\in \emph{in}(v)$ (when $e_1$ is forward and $e_2$ is backward) or $e_1,e_2\in \emph{out}(v)$ (when $e_1$ is backward and $e_2$ is forward). Now if $e_1,e_2\in \emph{in}(v)$, $f'(e_1)+f'(e_2)=f(e_1)+\dl+f(e_2)-\dl=f(e_1)+f(e_2)$ and if $e_1,e_2\in\emph{out}(v)$ then $f'(e_1)+f'(e_2)=f(e_1)-\dl+f'(e_2)+\dl=f(e_1)+f(e_2)$. Hence, $$\sum\limits_{e\in \emph{in}(v)}f'(e)=\sum\limits_{e\in \emph{in}(v)}f(e)=\sum\limits_{e\in\emph{out}(v)}f(e)=\sum\limits_{e\in\emph{out}(v)}f'(e)$$ Hence, $f'$ is a valid flow.
+\end{proof}
+
+\begin{lemma}{}{flowaugment-flowvalue}
+	At any iteration given $G_f$ if the flow, $f'$ obtained after flow augmentation of $f$ by $\dl$ then $$|f'|=|f|+\dl$$
+\end{lemma}
+\begin{proof}
+	Since we augment flow along an $s\rightsquigarrow t$ path, the first edge of the path is always in \emph{out}$(s)$. Let the first edge is $e=(s,u)$. Now $e$ has to be a forward edge in the path because otherwise $(u,s)\in E$ and then there is an incoming edge in $G$ which is not possible. Hence, $$|f'|=\sum\limits_{e\in \emph{out}(s)}f'(e)=\sum_{e\in \emph{out}(s)\setminus\{e\}}f(e)+f'(e)=\sum_{e\in \emph{out}(s)\setminus\{e\}}f(e)+f(e)+\dl=\sum_{e\in\emph{out}(s)}f(e)+\dl=|f|+\dl$$Hence, we have the lemma.
+\end{proof}
+\begin{lemma}{}{}
+	At every iteration of the Ford-Fulkerson Algorithm the flow values and the residual capacities of the residual graph are non-negative integers.
+\end{lemma}
+\begin{proof}
+	Initial flow and the residual capacities are non-negative integers. Let till $i^{th}$ iteration the flow values and the residual capacities were non-negative integers. Let the flow after $i^{th}$ iteration was $f$. Hence, $\forall\ e\in E$, $f(e)\in \bbZ_0$. Therefore, in the $G_f$ for all $e\in E_f$, $c_f(e)\in\bbZ_0$. Hence, $\dl\in\bbZ_0$. Therefore, $\forall\ e\in E$, $f'(e)\in\bbZ_0$. And Therefore, for all $e\in E_{f'}$ where $G_{f'}$ is the residual graph of the flow $f'$, $c_{f'}(e)\in\bbZ_0$. Hence, by mathematical induction the lemma follows.
+\end{proof}
+At any iteration let $P$ be the path from $s\rightsquigarrow t$. Then for all $e\in P$, $c_f(e)>0$. Therefore, $\dl=\min\limits_{e\in P}c_f(e)\geq 1$. Therefore, the algorithm must stop in at most $\sum\limits_{e\in \emph{out}(s)}c_e$ since we can have the value of a flow to be at max the value of the sum of capacities of edges in \emph{out}$(s)$ and Therefore, we can increase the flow at max that many times.
+\begin{lemma}{}{maxflownopath}
+	If $f$ is a max flow then there is no $s\rightsquigarrow t$ path in $G_f$.
+\end{lemma}
+\begin{proof}
+	Suppose there is an $s\rightsquigarrow t$ path $P$ in $G_f$. We will show that then $f$ is not a max flow following the algorithm. Then $\forall\ e\in P$, $c_f(e)>0$. Hence, $\dl=\min\limits_{e\in P}c_f(e)\geq 1$. Now after the flow augmentation process of $f$ by $\dl$ we get a new valid flow $f'$ by \lmref{flowaugment} and by \lmref{flowaugment-flowvalue} we have $|f'|=|f|+\dl>||f|$. Hence, $f$ is not a maximum flow. Hence, contradiction. Therefore, there is no $s\rightsquigarrow t$ path in $G_f$.
+\end{proof}
+\subsection{Max Flow Min Cut}
+\dfn{Cut Set}{For a graph $G=(V,E)$ and a subset $A\subseteq V$, the cut $(A,V\setminus A)$ is  a bipartition of $V$ where  the edges $E_A$ of the graph $G_A=(A,V\setminus A, E_A)$ is the set  $E_A= E\cap (A\times (V\setminus A))$.\parinn
+
+	Now if $s,t$ are two vertices of $G$ then an $s-t$ \emph{Cut} $(A,V\setminus A)$ is a cut such that $s\in A$ and $t\in V\setminus A$.}
+Now we define for a cut $(A,V\setminus A)$ the \emph{Capacity of the Cut} $(A,V\setminus A)=\sum\limits_{e\in E_A}c_e$. For an $s-t$ cut $(A,V\setminus A)$ we denote the capacity of the cut by $\emph{cap}(A)$. An $s-t$ \emph{Min  Cut} is an $s-t$ cut of minimum capacity. Then we have the following relation between cut and flow.
+\begin{lemma}{}{flowlessthancapacity}
+	Given a graph $G=(V,E)$, $s$, $t$, $c_e\in\bbZ_0$ for all $e\in E$ for any flow $f$ and an $s-t$ cut $(A,V\setminus A)$ $$|f|\leq \emph{cap}(A)$$
+\end{lemma}
+\begin{proof}
+	Given $f$ and the $s-t$ cut $(A,V\setminus A)$ we have \begin{align*}
+		|f| & = \sum_{e\in\emph{out$(s)$}}f(e)                                                          \\
+		    & = \sum_{v\in A}\lt[ \sum_{e\in\emph{out(v)}}f(e)-\sum_{e\in \emph{in$(v)$}}f(e)  \rt]   \\
+		    & = \sum_{\substack{e=(u,v),                                                                  \\ u\in A,v\notin A}}f(e) -\sum_{\substack{e=(u,v),\\ u\notin A,v\in A}}f(e) & [\text{Edges for both endpoints in $A$ are canceled out}]\\
+		    & =\sum_{e\in \emph{out$(A)$}}f(e)-\sum_{e\in \emph{in}(A)}f(e)                           \\
+		    & \leq \sum_{e\in \emph{out$(A)$}}f(e)\leq \sum_{e\in \emph{out$(A)$}}c_e=\emph{cap}(A)
+	\end{align*}
+	Hence, we have the lemma.
+\end{proof}
+Having this lemma we have for any flow $f$ and $s-t$ cut $(A,V\setminus A)$ we have $$|f|\leq \emph{cap$(A)$}\implies \max\limits_f|f|\leq\min\limits_{s-t\emph{ cut $(A,V\setminus A$)}}\emph{cap$(A)$}$$So we have the following theorem that the value of maximum flow is equal to the capacity of minimum cut.
+\begin{Theorem}{Max Flow Min Cut}{maxflowmincut}
+	Given a graph $G=(V,E)$, $s$, $t$, $c_e\in\bbZ_0$ for all $e\in E$. Then \tfae\begin{enumerate}[label=(\arabic*)]
+		\item $f$ is a maximum flow.
+		\item There is no $s\rightsquigarrow t$ path in $G_f$
+		\item There exists an $s-t$ cut of capacity $|f|$
+	\end{enumerate}
+\end{Theorem}
+\begin{proof}
+	\begin{itemize}[leftmargin=2cm]
+		\item[(1)$\implies$(2):] This is by \lmref{maxflownopath}.
+		\item[(2)$\implies$(3):] We are given a flow $f$ such that there is no $s\rightsquigarrow t$ path in $G_f$. We will construct an $s-t$ cut which has the capacity $|f|$. Now take $A$ to be all the vertices reachable from $s$ in $G_f$. This is a valid $s-t$ cut since $s\in A$ and as there is no $s\rightsquigarrow t$ path in $G_f$, $t\notin A$. Now $$|f|=\sum_{e\in \emph{out$(A)$}}f(e)-\sum_{e\in\emph{in$(A)$}}f(e)$$Now $\forall\ e=(u,v)\in E$ where $u\in A$ and $v\notin A$ we have  $c_{u,v}=f(u,v)\implies c_{u,v}-f(u,v)=0$ since otherwise $c_{u,v}-f(u,v)\neq 0\implies c_{u,v}>f(u,v)\implies (u,v)\in E_f$ and Therefore, $v$ is reachable from $s$ but $v\notin A$, contradiction. Therefore, $(u,v)$ is a backward edge. Also, $\forall\ e=(u,v)\in E$ where $u\notin A$ and $v\in A$ we have $f(u,v)=0$ since otherwise   $f(u,v)>0\implies (v,u)\in E_f$ and Therefore, $u$ is reachable from $s$ but $u\notin A$, contradiction. Hence, we have $$|f|=\sum_{e\in \emph{out$(A)$}}f(e)-\sum_{e\in\emph{in$(A)$}}f(e)=\sum_{e\in \emph{out$(A)$}}c_e=\emph{cap}(A)$$
+		\item[(3)$\implies$(1):] Now by \lmref{flowlessthancapacity} we have for any flow $f$ and $s-t$ cut $$|f|\leq \emph{cap$(A)$}\implies \max\limits_f|f|\leq\min\limits_{s-t\emph{ cut $(A,V\setminus A$)}}\emph{cap$(A)$}$$Now given $f$ there exists an $s-t$ cut of capacity $|f|$. Hence, $f$ is a max flow.
+	\end{itemize}
+\end{proof}We will get another proof of the \hyperref[maxflowmincut]{Max Flow Min Cut Theorem} in \autoref{another-proof-max-flow-min-cut} using strong duality of linear programming.
+
+Hence, at the end of the \hyperref[ford-fulkerson]{Ford-Fulkerson Algorithm} let the flow returned by the algorithm is $f$. The algorithm terminates when there is no $s\rightsquigarrow t$ path in $G_f$. Hence, by \hyperref[th:maxflowmincut]{Max Flow Min Cut Theorem} we have $f$ is a maximum flow. This completes the analysis of the Ford-Fulkerson Algorithm.
+
+Since the capacities of the edges can be very large we want an algorithm that returns the maximum flow with running time $\emph{poly}(n,m,\log c_e)$ where $n$ is the number of vertices and $m$ is the number of edges and $\log c_e$ basically means number of bits at most needed to represent the capacities.
+
+But Ford-Fulkerson algorithm takes does not run in \emph{poly}$(n,m,\log c_e)$ instead $\emph{poly}(n,m,c_e)$ as the while loop in the algorithm takes $\emph{poly}(c_e)$ many iterations. For example in the following graph: it takes around 100 steps
+\begin{center}
+	\begin{tikzpicture}
+		\node[draw, circle] (A) at (0, 0) {$s$};
+		\node[draw, circle] (B) at (2, 1) {$u$};
+		\node[draw, circle] (C) at (2, -1) {$v$};
+		\node[draw, circle] (D) at (4, 0) {$t$};
+
+		% Draw directed edges with values and reduced bends
+		\draw[,-latex, bend left=15] (A) to node[above] {100} (B);
+		\draw[,-latex, bend left=15] (B) to node[above] {100} (D);
+		\draw[,-latex] (B) -- node[left] {1} (C);
+		\draw[,-latex, bend right=15] (A) to node[below] {100} (C);
+		\draw[,-latex, bend right=15] (C) to node[below] {100} (D);
+	\end{tikzpicture}
+\end{center}
+and in general  Ford-Fulkerson takes $O(|f_{\max}|)$ time. For this reason we will now discuss a modification of the Ford-Fulkerson Algorithm which takes $\emph{poly}(n,m,\log c_e)$ time, Edmonds-Karp Algorithm.
+\subsection{Edmonds-Karp Algorithm}
+To get a \emph{poly}$(n,m,\log c_e)$ time algorithm  we will always pick the shortest $s\rightsquigarrow t$  path in the residual graph. This algorithm is known as the Edmonds-Karp Algorithm
+
+Suppose $f_i$ be the total flow after $i^{th}$ iteration. And $G_{f_i}$ be the residual graph with respect $f_i$. Then $f_0(e)=0$ for all $e\in E$ and $G_{f_0}=G$. Also suppose $\emph{dist}_i(v)=$ Shortest $s\rightsquigarrow v$ path distance in the residual graph $G_{f_i}$. Hence, $\emph{dist}_i(s)=0$ for all $i$ and $\emph{dist}_i(t)=\infty$ at the end of the algorithm.
+\begin{note}
+	In $i^{th}$ iteration of the Ford-Fulkerson Algorithm or Edmonds-Karp Algorithm if $P$ is the $s\rightsquigarrow t$ path in the residual graph $G_{f_i}$ where $e=(u,v)\in P$  is such that $c_{f_i}(u,v)=\dl=\min\limits_{e\in P}c_{f_i}(e)$ then the edge $(u,v)$ is not present in the next residual graph $G_{f_{i+1}}$. Thus, at least one edge disappears in each iteration of Ford-Fulkerson or Edmonds-Karp Algorithm.
+\end{note}
+Now we will prove following two lemmas which will help us to prove that the Edmond-Karp algorithm takes $O(mn)$ iterations.
+\begin{lemma}{}{distincreasewithiteration}
+	At any iteration $i$, 	$\forall\ v\in V$, $\emph{dist}_i(v)\leq\emph{dist}_{i+1}(v)$
+\end{lemma}
+\begin{proof}
+	Suppose this is not true. Then let $i$ be the first iteration in which there exists a vertex $v\in V$ such that $\emph{dist}_i(v)>\emph{dist}_{i+1}(v)$. We pick such $v$ which minimizes $\emph{dist}_{i+1}(v)$. Consider the shortest path $P$ from $s\rightsquigarrow v$ in $G_{f_{i+1}}$. Hence, length of $P$, $|P|=\emph{dist}_{i+1}(v)$. Let $(u,v)$ be the last edge of $P$.
+	\begin{center}
+		\begin{tikzpicture}
+			\node[draw, circle] (A) at (0, 0) {$s$};
+			\node[draw, circle] (B) at (5, 0) {$u$};
+			\node[draw, circle] (C) at (7, 0) {$v$};
+			\draw [-latex,
+				line join=round,
+				decorate, decoration={
+						zigzag,
+						segment length=10,
+						amplitude=.9,post=lineto,
+						post length=2pt
+					}]  ($(A)+(0.4,0)$) to ($(B)+(-0.4,0)$);
+			\draw[-latex] ($(B)+(0.4,0)$) to ($(C)+(-0.4,0)$);
+			\node at (-0.8,0) {$P:$};
+		\end{tikzpicture}
+	\end{center}
+	Then $$\emph{dist}_{i+1}(v)=\emph{dist}_{i+1}(u)+1\geq \emph{dist}_i(u)+1$$Here the last inequality follows because $v$ is the vertex which has the minimum $\emph{dist}_{i+1}(v)$ among all the vertices $w\in V$ which follows $\emph{dist}_i(w)>\emph{dist}_{i+1}(w)$. Now we will analyze case wise.\begin{itemize}
+		\item \textbf{Case 1:} $(u,v)\in E_{f_i}$. Then $$\emph{dist}_i(v)\leq \emph{dist}_{i}(u)+1\leq \emph{dist}_{i+1}(v)$$But this is not possible since $\emph{dist}_i(v)>\emph{dist}_{i+1}(v)$.
+		\item \textbf{Case 2:} $(u,v)\notin E_{f_i}$. Then $(v,u)\in E_{f_i}$. Since $(u,v)\in E_{f_{i+1}}$ then we must have sent flow along $(v,u)$. Since we take the shortest $s\rightsquigarrow t$ path in $G_{f_i}$ in the algorithm we have $\emph{dist}_i(u)=\emph{dist}_i(v)+1$. But then $$\emph{dist}_i(u)\leq \emph{dist}_{i+1}(v)-1\implies \emph{dist}_{i+1}(v)\geq \emph{dist}_i(v)+2$$But this is not possible.
+	\end{itemize}
+	Hence, contradiction \ctr Therefore, for all iterations $i$, for all vertices $v\in V$, $\emph{dist}_i(v)\leq \emph{dist}_{i+1}(v)$.
+\end{proof}
+
+\begin{lemma}{}{lineartimeedgeappear}
+	For any edge $e=(u,v)\in E$ the number of iterations where either $(u,v)$ appears or $(v,u)$ appears is at most $O(n)$ i.e. $$\lt|\lt\{i\colon (u,v)\notin G_{f_i}, (u,v)\in G_{f_{i+1}}\rt\}\rt|+\lt|\lt\{i\colon (v,u)\notin G_{f_i}, (v,u)\in G_{f_{i+1}}\rt\}\rt|=O(n)$$
+\end{lemma}
+\begin{proof}
+	Following the proof of \lmref{distincreasewithiteration}  in the second case we showed if $(u,v)\notin G_{f_i}$ but $(u,v)\in G_{f_{i+1}}$ then $\emph{dist}_{i+1}(v)\geq \emph{dist}_i(v)+2$. Hence, the distance increases by at least $2$. Now this can happen at most $O(n)$ many times since $\forall\ i$, $\emph{dist}_i(v)\leq n-1$. Hence, the number of iterations where either $(u,v)$ appears or $(v,u)$ appears is at most $O(n)$.
+\end{proof}
+
+With this this lemma we will prove that the Edmonds-Karp Algorithm takes $O(mn)$ iterations.
+\begin{Theorem}{}{}
+	Edmonds-Karp Algorithm terminates in $O(mn)$ many iterations.
+\end{Theorem}
+\begin{proof}
+	For $k$ iterations at least $k$ edges must disappear. Since each edge can reappear $O(n)$ times by \lmref{lineartimeedgeappear}, it can disappear at most $O(n)$ many times. In each iteration at least one edge disappears. Now after $O(mn)$ iterations number of disappearances is at most $O(mn)$. But after $O(mn)$ many disappearances  there are no edges remaining to disappear or reappear and Therefore, there is no $s\rightsquigarrow t$ path. Hence, the algorithm terminates. Therefore, the Algorithm terminates in $O(mn)$ iterations.
+\end{proof}
+
+Hence, Edmonds-Karp Algorithm takes $O(m^2n)\emph{poly}(\log c_e)=O\lt(m^2n\log^{O(1)}(c_e)\rt)$ time since it takes $O(mn)$ iterations and in each iteration it finds the shortest $s\rightsquigarrow t$ path in $G_{f_i}$ in $O(m)$ time and in each iteration it does addition and subtraction and finds minimum of the capacities which takes polynomial of the bits needed to represent them time.
+\section{Preflow-Push/Push-Relabel Algorithm}
+In this algorithm we will maintain something called ``Preflow" which is not a valid flow. Unlike Ford-Fulkerson, Edmonds-Karp it does not maintain a $s\rightsquigarrow t$ path in the residual graph and the algorithm stops when the preflow is actually a valid flow.
+\begin{Definition}{Preflow}{}
+	Given a graph $G=(V,E)$  and the edge capacities $c_e$, a function $f:E\to \bbR_0$ is a preflow if it satisfies:
+	\begin{enumerate}[label=\protect\circled{\arabic*}]
+		\item $\forall\ e\in E$, $f(e)\leq c_e$.
+		\item $\forall \ v\in V\setminus\{s\}$, $\sum\limits_{e\in\emph{in}(v)}f(e)\geq \sum\limits_{e\in\emph{out}(v)}f(e)$
+	\end{enumerate}
+\end{Definition}
+\begin{observation}
+	Unlike the definition of \hyperref[def:flow]{Flow} here in the second criteria we need  $\sum\limits_{e\in\emph{in}(v)}f(e)\geq \sum\limits_{e\in\emph{out}(v)}f(e)$ instead of  $\sum\limits_{e\in\emph{in}(v)}f(e)= \sum\limits_{e\in\emph{out}(v)}f(e)$.
+\end{observation}
+
+Now define for all $v\in V$ and for all preflow $f$, $\emph{excess}_f(v)=\sum\limits_{e\in\emph{in}(v)}f(e)-\sum\limits_{e\in\emph{out}(v)}f(e)$. If $f$ is a preflow then $\emph{excess}_f(s)\leq 0$ and $\forall\ v\in V\setminus\{s\},$ $\emph{excess}_f(v)\geq 0$
+\begin{lemma}{}{}
+	For all preflow $f$ $$\sum\limits_{v\in V}\emph{excess}_f(v)=0$$
+\end{lemma}
+\begin{proof}We have
+	\begin{align*}
+		\sum\limits_{v\in V}\emph{excess}_f(v) & = \sum\limits_{v\in V}\lt[ \sum\limits_{e\in\emph{in}(v)}f(e)-\sum\limits_{e\in\emph{out}(v)}f(e)\rt] = \sum\limits_{v\in V}\sum\limits_{e\in\emph{in}(v)}f(e)-\sum\limits_{v\in V}\sum\limits_{e\in\emph{out}(v)}f(e) = \sum_{e\in E}f(e)-\sum_{e\in E}f(e)=0
+	\end{align*}Hence, we have the lemma.
+\end{proof}
+Now for each $v\in V$ we assign a label $l(v)\in\bbZ_0$. The algorithm then sends flow from $u\to v$ if $l(v)=l(u)-1$.
+\begin{center}
+	\begin{tikzpicture}
+		\node[draw, circle] (A) at (0, 0) {$u$};
+		\node[draw, circle] (B) at (2, -1) {$v$};
+		\draw[dashed] (A)-- (2,0) node [right]{$l(u)$};
+		\draw[dashed] (-2,0) -- (A);
+		\draw[dashed] (B)-- (0,-1) ;
+		\draw[dashed] (4,-1) node [right]{$l(v)=l(u)-1$}  -- (B);
+		\draw[-latex] (A) -- (B);
+	\end{tikzpicture}
+\end{center}
+\begin{algorithm}
+	\DontPrintSemicolon
+	\SetKwComment{Comment}{ //}{}
+	\KwIn{Directed graph $G=(V,E)$, source $s$, target $t$ and edge capacities $C_e$ for all $e\in E$}
+	\KwOut{Flow $f$ with maximum value}
+	\Begin{
+		Initially $\forall\ e=(s,u)\in E$, $f(e)=c_e$ and $f(e)=0$ for all other edges.\;
+		$l(s)\longleftarrow n$\;
+		\For{$v\in V\setminus\{s\}$}{$l(v)\longleftarrow 0$}
+		\While{$\exs\ v\neq t$, $\emph{excess}_f(v)>0$}{
+			\If{$\exs\ u$, such that  $(v,u)\in E_f$ and $l(u)=l(v)-1$}{
+				$\dl\longleftarrow \min\lt\{\emph{excess}_f(v), c_f(v,u)\rt\}$\;
+				\If{$(v,u)$ is Forward Edge}{$f(v,u)\longleftarrow f(v,u)+\dl$}
+				\Else{$f(u,v)\longleftarrow f(u,v)-\dl$}
+			}
+			\Else{$l(v)\longleftarrow l(v)+1$\Comment*{Relabeling}}
+		}
+	}
+	\caption{\prb{Preflow-Push}}
+\end{algorithm}
+In the algorithm in line 8 if $\dl=c_f(v,u)$ then we call it \emph{saturating push} and if $\dl=\emph{excess}_f(v)$ then we call it \emph{non-saturating push}.
+
+Now we will show an example of how the algorithm on a graph. We will start the algorithm with the following graph:
+\begin{center}
+	\begin{tikzpicture}
+		\node[circle,draw] (s) at (0,0) {$s$};
+		\node[circle,draw] (v) at (2,0) {$v$};
+		\node[circle,draw] (t) at (4,0) {$t$};
+		\draw[-latex] (s) -- (v) node[above, midway]{$6$};
+		\draw[-latex] (v) -- (t) node[above, midway]{$4$};
+		\draw (0,-0.5) node{$3$} node[left=0.5cm]{$l:$};
+		\draw (2,-0.5) node{$0$};
+		\draw (4,-0.5) node{$0$};
+
+		%	\draw[-latex] ($(s)+(0.3,0.2)$) -- ($(v)-(0.3,-0.2)$) node[above, midway]{$6$};
+		%	\draw[-latex] ($(v)+(0.3,0.2)$) -- ($(t)-(0.3,-0.2)$) node[above, midway]{$4$};
+	\end{tikzpicture}
+\end{center}
+Below we will show change of the residual graph and preflow in each iteration of the \prb{While} loop:
+\begin{itemize}[label=$\bullet$]
+	\item 	Step 1:
+
+	      \begin{tikzpicture}
+		      \node[circle,draw] (s) at (0,0) {$s$};
+		      \node[circle,draw] (v) at (2,0) {$v$};
+		      \node[circle,draw] (t) at (4,0) {$t$};
+		      \draw[-latex,red!80!black] (v) -- (s) node[above, midway]{$6$};
+		      \draw[-latex] (v) -- (t) node[above, midway]{$4$};
+		      \draw (0,-0.5) node{$3$} node[left=0.5cm]{$l:$};
+		      \draw (2,-0.5) node{$\cancel{0}1$};
+		      \draw (4,-0.5) node{$0$};
+		      \draw (0,-1) node{$-6$} node[left=0.5cm]{$\emph{excess}_f:$};
+		      \draw (2,-1) node{$6$};
+		      \draw (4,-1) node{$0$};
+
+		      \draw[-latex] ($(s)+(0.3,0.7)$) -- ($(v)-(0.3,-0.7)$) node[above, midway]{$6$};
+		      \draw ($(s)+(-0.5,0.7)$) node[left]{$f:$};
+		      %	\draw[-latex] ($(v)+(0.3,0.2)$) -- ($(t)-(0.3,-0.2)$) node[above, midway]{$4$};
+
+		      \draw (10,0) node[text width=9cm]{Since $\emph{excess}_f(v)=6>0$. So in first iteration $v$ is taken. Since there is no edge $(v,u)$ with $l(u)=l(v)-1$, label of $v$ got increased};
+	      \end{tikzpicture}
+	\item 	Step 2:
+
+	      \begin{tikzpicture}
+		      \node[circle,draw] (s) at (0,0) {$s$};
+		      \node[circle,draw] (v) at (2,0) {$v$};
+		      \node[circle,draw] (t) at (4,0) {$t$};
+		      \draw[-latex,red!80!black] (v) -- (s) node[above, midway]{$6$};
+		      \draw[-latex,red!80!black] (t) -- (v) node[above, midway]{$4$};
+		      \draw (0,-0.5) node{$3$} node[left=0.5cm]{$l:$};
+		      \draw (2,-0.5) node{$1$};
+		      \draw (4,-0.5) node{$0$};
+		      \draw (0,-1) node{$-6$} node[left=0.5cm]{$\emph{excess}_f:$};
+		      \draw (2,-1) node{$\cancel{6}2$};
+		      \draw (4,-1) node{$\cancel{0}4$};
+
+		      \draw[-latex] ($(s)+(0.3,0.7)$) -- ($(v)-(0.3,-0.7)$) node[above, midway]{$6$};
+		      \draw ($(s)+(-0.5,0.7)$) node[left]{$f:$};
+		      \draw[-latex] ($(v)+(0.3,0.7)$) -- ($(t)-(0.3,-0.7)$) node[above, midway]{$4$};
+		      \draw (10,0) node[text width=9cm]{Since $\emph{excess}_f(v)=2>0$, in second iteration again  $v$ is selected.  There is an edge $(v,t)$ with $l(t)=0=l(v)-1=1-1$. Now $\dl=c_f(v,t)=4$. Hence, saturating push. The preflow gets updated,  $f(s,v)=6$, $f(v,t)=4$.};
+	      \end{tikzpicture}
+	\item Step 5:
+
+	      \begin{tikzpicture}
+		      \node[circle,draw] (s) at (0,0) {$s$};
+		      \node[circle,draw] (v) at (2,0) {$v$};
+		      \node[circle,draw] (t) at (4,0) {$t$};
+		      \draw[-latex,red!80!black] (v) -- (s) node[above, midway]{$6$};
+		      \draw[-latex,red!80!black] (t) -- (v) node[above, midway]{$4$};
+		      \draw (0,-0.5) node{$3$} node[left=0.5cm]{$l:$};
+		      \draw (2,-0.5) node{$\cancel{1}4$};
+		      \draw (4,-0.5) node{$0$};
+		      \draw (0,-1) node{$-6$} node[left=0.5cm]{$\emph{excess}_f:$};
+		      \draw (2,-1) node{$2$};
+		      \draw (4,-1) node{$4$};
+
+		      \draw[-latex] ($(s)+(0.3,0.7)$) -- ($(v)-(0.3,-0.7)$) node[above, midway]{$6$};
+		      \draw ($(s)+(-0.5,0.7)$) node[left]{$f:$};
+		      \draw[-latex] ($(v)+(0.3,0.7)$) -- ($(t)-(0.3,-0.7)$) node[above, midway]{$4$};
+		      \draw (10,0) node[text width=9cm]{Since $\emph{excess}_ff(v)=2>0$,  in next 3 iterations again  $v$ is selected. Since there is no edge $(v,u)$ with $l(u)=l(v)-1$, label of $v$ gets increased every time. Which becomes $4$ after $3$ iterations.};
+	      \end{tikzpicture}
+	      %\item 
+	\item Step 6:
+
+	      \begin{tikzpicture}
+		      \node[circle,draw] (s) at (0,0) {$s$};
+		      \node[circle,draw] (v) at (2,0) {$v$};
+		      \node[circle,draw] (t) at (4,0) {$t$};
+		      \draw[-latex] (s) -- (v) node[above, midway]{$2$};
+		      \draw[-latex,red!80!black] (v) to [bend left] node[below, midway]{$4$} (s) ;
+		      \draw[-latex,red!80!black] (t) -- (v) node[above, midway]{$4$};
+		      \draw (0,-0.5) node{$3$} node[left=0.5cm]{$l:$};
+		      \draw (2,-0.5) node{$4$};
+		      \draw (4,-0.5) node{$0$};
+		      \draw (0,-1) node{$-6$} node[left=0.5cm]{$\emph{excess}_f:$};
+		      \draw (2,-1) node{$\cancel{2}0$};
+		      \draw (4,-1) node{$4$};
+
+		      \draw[-latex] ($(s)+(0.3,0.7)$) -- ($(v)-(0.3,-0.7)$) node[above, midway]{$4$};
+		      \draw ($(s)+(-0.5,0.7)$) node[left]{$f:$};
+		      \draw[-latex] ($(v)+(0.3,0.7)$) -- ($(t)-(0.3,-0.7)$) node[above, midway]{$4$};
+		      \draw (10,0) node[text width=9cm]{Since $\emph{excess}_f(v)=2>0$,  in this iteration again  $v$ is selected. There is an edge $(v,s)$ with $l(s)=3=l(v)-1=4-1$. Now $\dl=\emph{excess}_f(v,s)=2$. Hence, it's non-saturating push. So the preflow gets updated $f(s,v)=6-2=4$, $f(v,t)=4$. Now it's a valid flow. Now there is no vertex with postive \emph{excess}. Hence, the algorithm stops.};
+	      \end{tikzpicture}
+\end{itemize}
+%\end{example}
+
+
+\begin{observation}\label{obs-labelsmonotone}
+	Labels are monotonically non-decreasing.
+\end{observation}
+\begin{observation}\label{obs-everyiterationpreflow}
+	For every iteration $f$ is always a preflow. The proof is similar to \lmref{flowaugment} but use inequalities.
+\end{observation}
+\begin{observation}\label{obs-labelofsisn}
+	$\sum\limits_{v\in V}\emph{excess}_f(v)=0$  and $\forall\ v\in V\setminus \{s\}$, $\emph{excess}_f(v)\geq 0$. Hence, $\emph{excess}_f(s)\leq 0\implies l(s)$ is unchanged.
+\end{observation}
+
+Now suppose $f^i$ denote the preflow after the $i^{th}$ iteration of the algorithm. Then define $$f^0(e)=\begin{cases}
+		c_e & \text{when $e=(s,u)$} \\ 0 & \text{otherwise}
+	\end{cases}$$
+Now we will show the correctness of the algorithm.
+\begin{lemma}{}{vtospathineachiteration}
+	$\forall\ v\in V$, $\forall\ i$, $\emph{excess}_{f^i}(v)>0\implies\exs\ v\rightsquigarrow s$ in $G_{f^i}$
+\end{lemma}
+\begin{proof}
+	First we fix $v$ and $i$ such that $\emph{excess}_{f^i}>0$. Let $X$ be the set of vertices reachable from $v$ in $G_{f^i}$. Now
+	$$
+		\sum_{u\in X}\emph{excess}_{f^i}(u) =\sum_{u\in X}\lt[ \sum_{e\in \emph{in}(v)}f^i(e)-\sum_{e\in\emph{out}(v)}f^i(e) \rt]= \sum_{e\in \emph{in}(X)}f^{i}(e)-\sum_{e\in\emph{out}{(X)}}f^{i}(e)$$
+	Now if $\sum\limits_{e\in \emph{in}(X)}f^{i}(e)>0$ then $\exs\ e=(u',u)\in E$ such that $u'\notin X$ and $u\in X$ and $f^{i}(e)>0$. Then the backward edge $(u,u')\in E_{f^i}$. Then $u'$ is reachable from $v$ in $G_{f^i}$. But $u'\notin X$. Contradiction \ctr Therefore, $\sum\limits_{e\in \emph{in}(X)}  f^{i}(e)=0$. Hence, $$\sum_{u\in X}  \emph{excess}_{f^i}(u)= \cancel{\sum_{e\in \emph{in}(X)}f^{i}(e)}-\sum_{e\in\emph{out}{(X)}}f^{i}(e)\leq 0$$But from \hyperref[obs-labelofsisn]{Observation \ref{obs-labelofsisn}}  we have $\forall\ w\in V\setminus\{s\}$, $\emph{excess}_{f^i}(w)\geq 0$. But at the same time $\sum\limits_{u\in X}  \emph{excess}_{f^i}(u)\leq 0$ and $\emph{excess}_{f^i}(v)>0$. Hence, $\exs\ $ a vertex $u\in X$ such that $\emph{excess}_{f^i}(u)< 0$. But we know only vertex with negative \emph{excess} is $s$. Therefore, $s\in X$. Hence, $s$ is reachable from $v$.
+\end{proof}
+\begin{lemma}{}{eachedgelabeldecrease1}
+	$\forall\ i$, if $(u,v)\in G_{f^i}$ then $l(v)\geq l(u)-1$.
+\end{lemma}
+\begin{proof}
+	We will prove this using induction on $i$. Initially $l(s)=n$ and $l(v)=0$ for all $v\in V\setminus\{s\}$. Hence, for all edges $(u,v)$ where $u,v\neq s$ this is satisfied. All the other edges incident on $s$ are in $\emph{in}(s)$ in the residual graph. And $l(s)=n\geq l(u)=0$. Therefore, the base case is followed.
+
+	Now suppose the condition is true for $f^{i-1}$. Now in the $i^{th}$ iteration   suppose the selected vertex is $v\in V\setminus\{t\}$ with $\emph{excess}_{f^{i-1}}>0$. Now there are two possible cases.\begin{itemize}[label=$\bullet$]
+		\item \textbf{Case 1:} If the step is relabeling then $f^{i-1}=f^i$, $G_{f^{i-1}}=G_{f^i}$ but $v$ is relabeled by $l(v)+1$. Now for any edge $e=(u,v)\in \emph{in}(v)$ by Inductive Hypothesis $l(v)\geq l(u)-1\implies l(v)+1\geq l(u)-1$. Now consider any edge $e=(v,w)\in \emph{out}(v)$.  By Inductive Hypothesis we have $l(w)\geq l(v)-1$. Now if $l(w)=l(v)-1$ then we would have pushed flow along the edge $(v,w)$. Since that is not the case we have $l(w)>l(v)-1$. Therefore, $l(w)\geq (l(v)+1)-1$. Hence, the condition is satisfied.
+		\item \textbf{Case 2:} If the step is pushing flow then suppose we push flow along the edge $(v,w)\in E_{f^{i-1}}$ and $l(w)=l(v)-1$. Now if we push flow along the edge $(v,w)$ we might introduce the reverse edge $(w,v)$ in $G_{f^i}$. In that case $l(v)=l(w)+1\geq l(w)-1$. Hence, the condition is satisfied.
+	\end{itemize}
+	Therefore, by mathematical induction $\forall\ i$, $\forall \ (u,v)\in E_{f^i}$, $l(v)\geq l(u)-1$.
+\end{proof}
+
+\begin{corolary}{}{nostpath}
+	There is no $s\rightsquigarrow t$ path in $G_{f^i}$ in any iteration $i$. Thus when the algorithm terminates $f$ is a max flow.
+\end{corolary}
+\begin{proof}
+	Now $l(s)=n$ and $l(t)=0$. We fix $v$ and $i$. If there is a $s\rightsquigarrow v$ path in $G_{f^i}$ then length of the path is at most $n-1$. For each edge in the path the label decreases by at most $1$ by \lmref{eachedgelabeldecrease1}. Hence, $l(v)\geq 1$. Therefore, for every vertex $v\in V$, reachable from $s$ we have $l(v)\geq 1$. But $l(t)=0$. Hence, $t$ is not reachable from $s$. 	Hence, if the algorithm terminates, band if $f$ is a valid flow then y \hyperref[th:maxflowmincut]{Max Flow Min Cut Theorem}  it is a max flow.
+\end{proof}
+\begin{corolary}{}{eachvertexlabel2n}
+	$\forall\ v\in V$, $\forall\ i$, $l(v)\leq 2n$.
+\end{corolary}
+\begin{proof}
+	Suppose $\exs\ v,i$ such that $l(v)=2n$ and $\emph{excess}_{f^i}(v)>0$. By \lmref{vtospathineachiteration} there exists an $v\rightsquigarrow s$ path in $G_{f^i}$. Now by \lmref{eachedgelabeldecrease1} for each edge in the path the label decreases by at most $1$ and the length of the path is at most $n-1$. Since $l(v)=2n$, $l(s)\geq n+1$. But we know $l(s)$ for all $i$ by \hyperref[obs-labelofsisn]{Observation \ref{obs-labelofsisn}}. Hence, contradiction \ctr Therefore, for all $v\in V$ and $\forall\ i$, $l(v)\leq 2n$.
+\end{proof}
+
+\begin{corolary}{}{relabel2n2}
+	Total number relabeling operations is $\leq 2n^2$
+\end{corolary}
+\begin{proof}
+	By \corref{eachvertexlabel2n} each vertex label can be at most $2n$. So total number of relabeling operations done in the algorithm is at most $2n^2$
+\end{proof}
+
+Now we need a bound on the number of push operations. We will count separately the number of Saturating Pushes and number of Non-Saturating Pushes.
+\begin{lemma}{}{satpush2mn}
+	Total number of saturating pushes is $\leq 2mn$
+\end{lemma}
+\begin{proof}
+	We first fix an edge $(v,w)$. Now we will count the number of saturating pushes along $(v,w)$. Then $\dl=c_f(v,w)$.  Now consider the scenario of  two consecutive saturating pushes along $(v,w)$. When the first saturating push along $(v,w)$ occurred we have $l(w)=l(v)-1$. Now if $(v,w)$ is forward edge then $\dl=c_f(v,w)=c_{v,w}-f(v,w)$. Then new flow along $(v,w)$ is $f(v,w)+c_f(v,w)=c_{v,w}$. Hence, the edge $(v,w)$ vanishes and the flow along $(w,v)$ is $c_{v,w}$. If $(v,w)$ is a backward edge then $\dl=c_f(w,v)=f(w,v)$. Hence, then new flow along $(w,v)$ is $f(w,v)-\dl=0$. Hence, again the $(w,v)$ edge vanishes and the flow along $(w,v)$ is $f(w,v)$.
+
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{scope}
+				\node[draw, circle] (A) at (0, 0) {$v$};
+				\node[draw, circle] (B) at (2, -1) {$w$};
+				\draw[dashed] (A)-- (2,0) node [right]{$l(v)$};
+				\draw[dashed] (-2,0) -- (A);
+				\draw[dashed] (B)-- (0,-1) ;
+				\draw[dashed] (4,-1) node [right]{$l(w)=l(v)-1$}  -- (B);
+				\draw[-latex] (A) -- (B);
+			\end{scope}
+			\draw[thick,-latex] (3.5,-0.6) -- node[midway, above]{Saturated Push}(7.5,-0.6);
+			\begin{scope}[shift={(8,0)}]
+				\node[draw, circle] (A) at (0, 0) {$v$};
+				\node[draw, circle] (B) at (2, -1) {$w$};
+				\draw[dashed] (A)-- (2,0) node [right]{$l(v)$};
+				\draw[dashed] (-2,0) -- (A);
+				\draw[dashed] (B)-- (0,-1) ;
+				\draw[dashed] (4,-1) node [right]{$l(w)=l(v)-1$}  -- (B);
+				\draw[-latex] (B) -- (A);
+			\end{scope}
+		\end{tikzpicture}
+	\end{center}
+
+	Therefore, after a saturated push along $(v,w)$ the edge vanishes and the $(w,v)$ edge is there. Hence, in order for another push along $(v,w)$ the algorithm must push flow along $(w,v)$. And this happens when we have the new labels of $v,w$ follow the condition $l'(w)=l'(v)+1$. Since by \hyperref[obs-labelsmonotone]{Observation \ref{obs-labelsmonotone}} the labels never decreases in order for $l(w)=l(v)+1$ the label of $v$ must  increase  by at least $2$.
+
+	Now starting from $l(v)=0$ we have by \lmref{eachvertexlabel2n} $l(v)\leq 2n$ and for each saturating push along $(v,w)$ the $l(v)$ increase by $2$. Hence, at most $n$ many saturating pushes occurred along $(v,w)$. Now in the original graph since there are $m$ edges the total number of saturating pushes is $\leq 2mn$.
+\end{proof}
+
+
+Now we will count the number of non-saturating pushes. For such pushes along any edge $(v,u)$ the $\emph{excess}_f(v)$ goes to $0$. We define the potential function for a preflow $f$, $$\Phi(f)=\sum_{v:\emph{ excess}_f(v)>0}l(v)$$Now $\Phi(f)\geq 0$ for all preflow $f$ and initially at the start of the algorithm $\Phi(f^0)=0$.
+
+\begin{lemma}{}{nonsatpushleveldecrease1}
+	For each non-saturating push  $\Phi(f)$ decreases by at least 1.
+\end{lemma}
+\begin{proof}
+	Suppose 	at any iteration $i$  a non-saturating push occur along an edge $(v,w)$. Therefore, $l(w)=l(v)-1$. We will show that $\Phi(f^i)\leq \Phi(f^{i-1})-1$.		We have $\dl=\emph{excess}_{f^{i-1}}(v)$. Now if $(v,w)$ is a forward edge then new flow along $(v,w)$ is $f^i(v,w)=f^{i-1}(v,w)+\emph{excess}_{f^{i-1}}(v)$. Since $(v,w)\in \emph{out}(v)$
+	$$\emph{excess}_{f^i}(v)=\sum_{e\in \emph{in}(v)}f^i(e)-\sum_{e\in \emph{out}(v)}f^i(e)=          \sum_{e\in \emph{in}(v)}f^{i-1}(e)-\sum_{e\in \emph{out}(v)\setminus\{(v,w)\}}f^{i-1}(e)-f^i(v,w)  =   \emph{excess}_{f^{i-1}}(v)-\dl=0$$ Otherwise if $(v,w)$ is a backward edge. Then  ew flow along $(w,v)$ is  $f^i(w,v)=f^{i-1}(w,v)-\emph{excess}_{f^{i-1}}(v)$. Since $(w,v)\in \emph{in}(v)$ $$\emph{excess}_{f^i}(v)=\sum_{e\in \emph{in}(v)}f^i(e)-\sum_{e\in \emph{out}(v)}f^i(e)=    f^{i}(w,v) +     \sum_{e\in \emph{in}(v)\setminus\{(w,v)\}}f^{i-1}(e)-\sum_{e\in \emph{out}(v)}f^{i-1}(e)  =  -\dl+ \emph{excess}_{f^{i-1}}(v)=0$$In both cases $\emph{excess}_{f^i}(v)=0$. Therefore, 	 $v$ goes out of the summation. 		Now there are two cases depending on the value of $\emph{excess}_{f^{i-1}}(w)$\begin{itemize}[label=$\bullet$]
+		\item \textbf{Case 1:}
+		      If $\emph{excess}_{f^{i-1}}(w)>0$ i.e. $w$ had excess flow before push operation then $\Phi(f^{i-1})$ decreases by $l(v)$ i.e. $\Phi(f^i)=\Phi(f^{i-1})-l(v)$. Since $l(w)=l(v)-1$ and by  \hyperref[obs-labelsmonotone]{Observation \ref{obs-labelsmonotone}} $l(v)\geq 1$. Therefore, $\Phi(f^i)=\Phi(f^{i-1})-l(v)\leq \Phi(f^{i-1})-1$.
+		\item \textbf{Case 2:}	If $\emph{excess}_{f^{i-1}}(w)=0$, then $\emph{excess}_{f^i}(w)=\emph{excess}_{f^{i-1}}(w)+\dl>0$ since $\dl=\emph{excess}_{f^{i-1}}(v)>0$ and Therefore, $\Phi(f^i)=\Phi(f^{i-1})-l(v)+l(w)=\Phi(f^{i-1})-1$
+	\end{itemize}
+	Hence, for both the cases $\Phi(f^i)\leq \Phi(f^{i-1})-1$. Therefore, $\Phi(f^{i-1})$ decreases by at least 1.
+\end{proof}
+
+
+\begin{observation}
+	For relabeling operation $\Phi(f)$ increases by $1$.
+\end{observation}
+Since there are at most $2n^2$ relabeling operations by  \corref{relabel2n2}, $\Phi(f)$ increases by at most $2n^2$ with relabeling operations.
+\begin{observation}
+	For each saturating push $\emph{excess}_f(v,w)$ might not go to $0$ and Therefore, $\Phi$ might increase.
+\end{observation}
+Now by \lmref{satpush2mn} total number of saturated pushes is at most $2mn$. And by \corref{eachvertexlabel2n} each vertex has label at most $2n$. Hence, in total $\Phi(f)$ can increase at most $2mn\times 2n=4mn^2$ by saturated pushes. Hence, $\Phi(f)$ increases at most $2n^2+2mn\times 2m=O(mn^2)$.
+
+
+Now $$\#\text{Non-saturating Pushes}  \leq \text{Total decrease in }\Phi\leq \text{Total increase in }\Phi\leq 2n^2+4mn^2=O(mn^2)$$
+Therefore, total number of iterations of the \prb{While} loop is $\#$Relabeling$+\#$Saturated Push$+\#$Non-saturated Push$= 2n^2+2mn+O(mn^2)=O(mn^2)$.  There fore the algorithm takes $O(mn^2)$ iteration. In each iteration it takes $O(m+n)$ time. Therefore, the runtime of the algorithm is $O(mn^2)O(n+m)=O(m^2n^2)$.

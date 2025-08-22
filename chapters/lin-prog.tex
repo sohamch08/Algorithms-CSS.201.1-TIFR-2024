@@ -1,0 +1,382 @@
+\chapter{Linear Programming}
+\section{Introduction}
+\dfn{Linear Program}{A linear programming problem asks for a vector $x\in \bbR^d$ that maximizes or minimizes a given linear function, among all vectors $x$ that satisfy given set of linear inequalities.}
+
+The general form of a maximization linear programming problem is the following: given $c\in \bbR^n$, $b\in \bbR^m$, $a_i\in\bbR^n$ for each $i\in [m]$ then 
+\begin{maxi*}
+	{}{c^Tx}{}{}
+	\addConstraint{ a_i^Tx\leq b_i}{\quad\forall\ i\in[p]}
+	\addConstraint{ a_i^Tx= b_i}{\quad\forall\ i\in\{p+1,\dots, p+q\}}
+	\addConstraint{ a_i^Tx\geq b_i}{\quad\forall\ i\in\{p+q+1,\dots,m\}}
+	\addConstraint{x_j\geq 0}{\quad\forall j\in [k]}
+	\addConstraint{x_j\leq 0}{\quad\forall j\in [\{k+1,\dots, k+l\}\quad \text{(Some $x_j$'s are free)}}
+\end{maxi*}
+
+The similar goes for minimization linear programming problem. For maximization problem we can always  write the LP in the form 
+\begin{maxi*}
+	{}{c^T\hat{x}}{}{}
+	\addConstraint{ \hat{a}_i^Tx\leq b'_i}{\quad\forall\ i\in[m]}
+	\addConstraint{x'_j\geq 0}{\quad\forall j\in [n]}
+\end{maxi*}And then the LP is said to be in the \textit{\textbf{canonical form}}.
+What we can do is the following: \begin{itemize}
+	\item For $i\in \{p+q+1,\dots, m\}$, we can replace $a_i^Tx\leq b_i$ with $-a_i^Tx\geq -b_i$
+	\item For $i\in \{p+1,\dots, p+q\}$, we can replace with two constraints $a_i^Tx\geq b_i$ and $a_i^Tx\leq b_i$
+	\item For $j\in \{k+1\dots, k+l\}$, we can replace $x_j\leq 0$ with $-x_j\geq 0$ 
+	\item For $j\in \{k+l+1\dots, n\}$, we can replace the free $x_j$'s with $x_j^+-x_j^-$ all the equations where $x_j^+,x_j^-\geq 0$
+\end{itemize}This way we can always get a LP of that form. Now we can replace the $\hat{a_i}$ for $i\in [m]$ with a matrix $A\in \bbR^{m\times n}$ and replace the constraint   $\hat{a}_i^Tx\leq b'_i$, $\forall $ $i\in[m]$ with $Ax\leq b$
+\begin{center}
+	\begin{minipage}{0.35\textwidth}
+		\begin{maxi*}
+			{}{c^Tx}{}{}
+			\addConstraint{Ax\leq b}
+			\addConstraint{x\geq 0}
+		\end{maxi*}
+	\end{minipage}	\begin{minipage}{0.35\textwidth}
+	\begin{mini*}
+		{}{c^Tx}{}{}
+		\addConstraint{Ax\geq b}
+		\addConstraint{x\geq 0}
+	\end{mini*}
+\end{minipage}
+\end{center}
+\section{Geometry of LP}
+\begin{Definition}{Feasible Point and Region}{}
+	A point $x\in \bbR^n$ is {\textit{feasible}} with respect to some LP if it satisfies all the linear constraints. The set of all feasible points is called the {\textit{feasible region}} for that LP.
+\end{Definition}Feasible region of a LP has a particularly nice geometric structure. Before that we will first introduce some geometric terminologies used in the linear programming context: 
+\dfn{Hyperplane, Polyhedron, Polytope}{\begin{itemize}
+		\item \textbf{Line}: The set $\{x+\lm d, \lm\in \bbR\}$ is line for any $x,d\in\bbR^n$.
+		\item \textbf{Hyperplane}: The set  $\{x\in \bbR^n\colon a^x=b\}$ is a hyperplane for any $a\in \bbR^n$ and $b\in \bbR$.
+		\item \textbf{Hyperspace}: The set  $\{x\in \bbR^n\colon a^x\leq b\}$ is a hyperspace or half-space for any $a\in \bbR^n$ and $b\in \bbR$.
+		\item \textbf{Polyhedron}: A polyhedron is the intersection of a finite set of half-spaces i.e. the set $\{x\in\bbR^n\colon Ax\leq b\}$ for any $A\in\bbR^{n\times m}$, $b\in \bbR^m$. 
+		\item \textbf{Polytope}: A bounded polyhedron is called a polytope.
+\end{itemize}} Now it is not hard to verify that any polyhedron is a convex set i.e. if a polyhedron contains two points  then it contains the entire line segment joining those two points.
+\begin{lemma}{}{}
+	Polyhedron is a convex set
+\end{lemma}
+
+Hence the feasible region of a LP creates a polyhedron in $\bbR^n$. And $c^Tx$ is the  hyperplane normal to the vector $c$ and the objective of the LP is by moving the plane normal to the vector $c$ for which point in the polyhedron the hyperplane  $c^Tx$ has the highest value. Since polyhedron can be unbounded there may not exists any point $x$ where $c^Tx$ is maximum.
+
+
+	Suppose we have a LP \begin{maxi*}
+		{}{c^Tx}{}{}
+		\addConstraint{Ax\leq b}
+		\addConstraint{x\geq 0}
+	\end{maxi*}Let $P$ be the polyhedron $P=\{x\in \bbR^n\colon Ax\leq b\}$. Then given $x^*\in P$ if any constraint $a_i^Tx^*=b_i$ then this constrain is said to be \textit{tight} or \textit{binding} or \textit{active} at $x^*$. Now two constraints $a_i^Tx\leq b_i$ and $a_j^Tx\leq b_j$ are said to be linearly independent if $a_i$ and $a_j$ are linearly independent. 
+
+\begin{Definition}{Basic Solution and Basic Feasible Solution}{}
+	$x^*\in \bbR^n$ is a basic solution if $n$ linearly independent constraints are active at $x^*$ (Doesn't need to  be feasible).\parinn
+	
+	$x^*\in\bbR^n$ is a basic feasible solution if $x^*$ is a basic solution and $x^*\in P$. The basic feasible solutions are also called \textit{corners} of a polyhedron.
+\end{Definition}
+\begin{Theorem}{}{}
+	Given a LP 	\begin{mini*}
+		{}{c^Tx}{}{}
+		\addConstraint{Ax\geq b}
+		\addConstraint{x\geq 0}
+	\end{mini*}Let $P$ is the polyhedron $\{x\in\bbR^n\colon Ax\leq b, x\geq0\}$ . Suppose $P$ is non-empty and has at least one basic feasible solution  then either the optimal value is $-\infty$ or there is an optimal basic feasible solution. 
+\end{Theorem}
+
+\begin{Theorem}{}{}
+	If polyhedron $P$ does not contain a line it contains at least one basic feasible solution (Hence if $P$ is bounded it contains at least one basic feasible solution).
+\end{Theorem}
+
+With this geometry in hand, we can easily picture two pathological cases where a given linear programming problem has no solution. The first possibility is that there are no feasible points; in this case the problem is called \textit{infeasible}. The second possibility is that there are feasible points at which the objective function is arbitrarily large; in this case, we call the problem \textit{unbounded}. The same polyhedron could be unbounded for some objective functions but not others, or it could be unbounded for every objective function.
+
+\begin{Example}{}{}
+	\begin{itemize}
+		\item \textbf{Maximum Matchings:} Given undirected  graph $G=(V,E)$. Say variable $x_e$ for each $e\in E$, $x_e=1\implies e$ in matching and $x_e=0$ otherwise.
+		\begin{maxi*}
+			{}{\sum\limits_{e\in E}x_e}{}{}
+			\addConstraint{}{\sum\limits_{e\text{ incident on }v}x_e\leq 1}{\quad \forall \ v\in V}
+			\addConstraint{}{x_e\geq 0}{\quad \forall\ e\in E}
+			\addConstraint{}{x_e\in \{0,1\}}{\quad \forall\ e\in E}
+		\end{maxi*}
+	\begin{observation*}
+		$M$ is a matching iff $\{x\colon x_e=1\text{ if }e\in M, =0\text{ otherwise}\}$ is a feasible solution
+	\end{observation*}
+		\item \textbf{Maximum $s-t$ Flow:} Given directed graph $G=(V,E)$ with vertices $s,t$ and capacity $c_e$ on edges. Say variable $x_e$ for each edge and equal to flow on that edge. Then the LP of this problem:
+				\begin{maxi*}
+			{}{\sum\limits_{e\in \textit{out}(s)}x_e}{}{}
+			\addConstraint{}{\sum\limits_{e\in\textit{in}(v)}x_e-\sum\limits_{c\in\textit{out}(v)}x_e=0}{\quad \forall \ v\in V, v\neq s,t}
+			\addConstraint{}{c_e\geq x_e\geq 0}{\quad \forall\ e\in E}
+		\end{maxi*}
+	\end{itemize}
+\end{Example}
+
+We will now introduce a theorem without proof that for any LP with  a polytope we can find a solution in polynomial time.
+\begin{Theorem}{}{lp-solve-polytime}
+	Let $P=\{x\in\bbR^n\colon Ax\geq b\}$ be a polytope. Then we can find an optimal basic feasible solution for the LP $\min c^Tx$ where $x\in P$ in polynomial time.
+\end{Theorem}
+\section{LP Integrality}
+For the LP for matchings in bipartite graphs $G=(L\cup R,E)$ we have:
+		\begin{maxi*}
+	{}{\sum\limits_{e\in E}x_e}{}{}
+	\addConstraint{}{\sum\limits_{e\text{ incident on }v}x_e\leq 1}{\quad \forall \ v\in V}
+	\addConstraint{}{x_e\geq 0}{\quad \forall\ e\in E}
+\end{maxi*}
+We want $x_e\in \{0,1\}$ i.e. we want to have integral solution for this LP
+\begin{question}{}{}
+	LPs can give fractional solutions. When is solution integral?
+\end{question}
+Sufficient Condition: Every basic feasible solution of the feasible polytope is integral i.e. $x^*$ is basic feasible solution $\implies x^*\in \bbZ^n$. If all basic feasible solution are integral then for all $I\subseteq [m]$ with $|I|=n$, $A_I^{-1}b_I$ is integral. Let $x=A_I^{-1}b_I$ Then $j^{th}$ component $x_j=\frac{|A_I^j|}{|A|}$ (Cramer's Rule).
+\subsection{Totally Unimodular Matrix}
+\begin{Definition}{Totally Unimodular Matrix (TUM)}{}
+	A matrix $A\in \{0,1,-1\}^{m\times n}$ is totally unimodular (TU) if every square submatrix of $A$ has determinant $-1,0,1$.
+\end{Definition}Hence in the above LP is $A$ is TU and $b$ is integral then all basic feasible solutions are integral.
+\begin{lemma}{}{}
+	Let $A$ be TUM and $b\in \bbZ^n$ then $P=\{x\colon Ax\geq b\}$ is integral i.e. every basic feasible solution is integral.
+\end{lemma}
+
+Hence using \thmref{lp-solve-polytime} if the polytope is integral we can find optimal integral solution in polynomial time. We will now discuss properties of Totally Unimodular Matrix.
+\begin{lemma}{}{tum-prop}
+	$A\in \{0,1,-1\}^{m\times n}$ is TU iff the following are TU:
+	\begin{enumerate}[label=(\roman*)]
+		\item $-A$
+		\item $A^T$
+		\item $\mat{A & e_i}$, $\mat{A & -e_i}$
+		\item $\mat{A& I}$, $\mat{A & -I}$
+		\item $\mat{A & A_i}$, $\mat{A & -A_i}$ where $A_i$ is the $i^{th}$ column of $A$. 
+	\end{enumerate}
+\end{lemma}
+
+
+\begin{corolary}{}{}
+	If $A$ is TUM and $a,b,c,d\in\bbZ^n$ are integer vectors then the polytope $Q=\{x\in \bbR^n\colon a\leq Ax\leq b, c\leq x\leq d\}$ is integral.
+\end{corolary}
+\begin{proof}
+	We can combine the four inequalities in one inequality. Consider the matrix $\mat{A & -A & I & -I}^T$. Then the given polytope is $$Q=\lt\{x\in\bbZ^n\colon \mat{A \\ -A \\ I \\ -I} x\leq \mat{b \\-a\\ d \\ -c}\rt\}$$By \lmref{tum-prop}, $\mat{A & -A & I & -I}^T$ is a TUM since $A$ is TUM. Therefore the polytope $Q$ is integral.
+\end{proof}
+
+The following theorem lets us to give a necessary and sufficient condition to check if a given matrix is TUM. Again we will accept the following theorem without the proof since the proof is a little nontrivial.
+\begin{Theorem}{}{}
+	Let $A\in\{-1,0,1\}^{m\times n}$. Then $A$ is TU iff every set $S\subseteq [n]$ can be partitioned into $S_1, S_2$ such that $$\sum_{i\in S_1}A_i-\sum_{i\in S_2}A_i\in \{-1,0,1\}^m$$where $A_i$ is the $i^{th}$ column of $A$. C
+\end{Theorem}
+\subsection{Integrality of Some Well-Known Polytopes}
+Now using this theorem we will show that the polytope for bipartite maximum matching is integral. The LP for bipartite maximum matching is given by:
+\begin{maxi*}
+	{}{\sum\limits_{e\in E}x_e}{}{}
+	\addConstraint{}{\sum\limits_{e\text{ incident on }v}x_e\leq 1}{\quad \forall \ v\in V}
+	\addConstraint{}{x_e\geq 0}{\quad \forall\ e\in E}
+\end{maxi*} 
+\begin{lemma}{}{bp-max-matching-polytope-integral}
+	The polytope for bipartite maximum matching is integral.
+\end{lemma}
+\begin{proof}
+	Let $A$ be the matrix for the polytope. Now clearly from the construction of the polytope we have $A\in\{0,1\}^{n\times m}$ where $n=|V|$ and $m=|E|$. Now we will show that $A^{T}$ is TUM. Let $L$ and $R$ are the two sets of vertices in the bipartite graph. Now suppose $S\subseteq L\cup R$. Then take $S_1=S\cap L$ and $S_2=S\cap R$. Then for any row $e\in E$, we have $$\sum\limits_{i\in S_1}A_i-\sum\limits_{i\in S_2}A_i\in\{-1,0,1\}$$Hence $A^T$ is TUM and therefore by \lmref{tum-prop} $A$ is TUM. Hence the polytope for bipartite maximum matching is integral.
+\end{proof}
+\nt{For general graphs this polytope is not integral. Consider the triangle graph $K_3$. Then the point $\lt(\frac{1}{2},\frac{1}{2},\frac12\rt)$ is a feasible solution but not in the convex hull of the integral solutions $(1,0,0)$, $(0,1,0)$ and $(0,0,1)$.}
+\begin{lemma}{}{max-flow-polytope-integral}
+	The LP for $s-t$ max flow  is \begin{maxi*}
+			{}{\sum\limits_{e\in \textit{out}(s)}x_e}{}{}
+			\addConstraint{}{\sum\limits_{e\in\textit{in}(v)}x_e-\sum\limits_{e\in\textit{out}(v)}x_e=0}{\quad \forall \ v\in V, v\neq s,t}
+			\addConstraint{}{c_e\geq x_e\geq 0}{\quad \forall\ e\in E}
+		\end{maxi*}Then the max flow polytope is integral.
+\end{lemma}
+\begin{proof}
+	Let $A$ be the matrix for the polytope. We will show that $A$ is TUM. Given $S\subseteq V\setminus\{s,t\}$ take $S_1=S$ and $S_2=\emptyset$. By the first condition of the polytope for all vertices we already have satisfied the condition $$\sum\limits_{i\in S_1}A_i-\sum\limits_{i\in S_2}A_i=0\in\{-1,0,1\}^m$$Therefore the polytope is TUM and hence integral.
+\end{proof}
+
+\section{Duality}
+Suppose we have the following LP:
+\begin{mini*}
+{}{x_1+2x_2}{}{}
+\addConstraint{x_1-x_2}{}{\geq 3}
+\addConstraint{2x_1+x_2}{}{\geq 1}
+\addConstraint{x_1,x_2}{}{\geq 0}
+\end{mini*}Suppose we want to have a lower bount on the optimal solution of the LP. Then we will try to find a linear combination of the constriants such that in the LHS we obtain some thing which is at most the objective function and on the RHS we get the lower bound. So let we multiply the first constraint with $y_1$, second with $y_2$. For now $y_1,y_2$ are unknowns. Then we have the following:\begin{align*}
+	x_1+2x_2 & \geq (y_1+2y_2)x_1+(-y_1+y_2)x_2\\
+	& = y_1(x_1-x_2)+y_2(2x_1+x_2)\geq 3y_1+y_2
+\end{align*}
+But we also have the conditions that the coefficients of $x_1$ and $x_2$ can not be more than the coefficients of $x_1$ and $x_2$ in the objective function respectively. So we have the following conditions:
+\begin{align*}
+	y_1 +2y_2 & \leq 1\\
+	-y_1+y_2 & \leq 2
+\end{align*}So now we have found a maximization LP which gives us a lower bound on the optimal solution of the original LP:
+\begin{maxi*}
+{}{3y_1+y_2}{}{}
+\addConstraint{y_1+2y_2}{}{\leq 1}
+\addConstraint{-y_1+y_2}{}{\leq 2}
+\addConstraint{y_1,y_2}{}{\geq 0}
+\end{maxi*}This is called the \textit{dual} of the original LP. The original LP is called the \textit{primal} of the dual. The primal and dual are related in a very nice way. The following theorem gives us the relation between primal and dual.
+
+For every minimization LP there is a dual LP that provides a lower bound on the optimal value of the primal LP.
+\nt{If the Primal LP is unbounded then the dual LP is infeasible.}
+\begin{lemma}{}{dual-dual}
+	Dual of Dual is the primal LP
+\end{lemma}
+\subsection{Dualization of LP}
+If the primal LP is in canonical form then we have the following:
+\begin{center}
+	\begin{minipage}{0.35\textwidth}
+		\begin{maxi*}
+			{}{c^Tx}{}{}
+			\addConstraint{Ax\leq b}
+			\addConstraint{x\geq 0}
+		\end{maxi*}
+		\begin{center}
+			$\boxed{\text{Primal}}$
+		\end{center}
+	\end{minipage}	$\iff$\begin{minipage}{0.35\textwidth}
+	\begin{mini*}
+		{}{b^Ty}{}{}
+		\addConstraint{A^Ty\leq c}
+		\addConstraint{x\geq 0}
+	\end{mini*}
+	\begin{center}
+		$\boxed{\text{Dual}}$
+	\end{center}
+\end{minipage}
+\end{center} 
+
+\begin{proof-of-lemma}[dual-dual]
+	Suppose for $A\in\bbR^{m\times n}$, $c\in\bbR^n$, $b\in\bbR^m$ we have the following LP:\begin{maxi*}{}{c^Tx}{}{}
+		\addConstraint{}{Ax\leq b}{\quad x\in\bbR^n}
+	\end{maxi*}
+	Then the dual the LP is 		\begin{mini*}{}{b^Ty}{}{}
+		\addConstraint{}{A^Ty=c}{\quad y\in\bbR^m}
+		\addConstraint{}{y\geq 0}{}
+	\end{mini*}
+
+	Now consider the LP
+
+	\begin{maxi*}{}{-b^Ty}{}{}
+		\addConstraint{}{A^Ty\leq c}{\quad y\in\bbR^m}
+		\addConstraint{}{-A^Ty\leq -c}{}
+		\addConstraint{}{-y\leq 0}{}
+	\end{maxi*}
+
+	These two LP's are equivalent. Now we obtained another LP which is equivalent to the dual LP. Now we will work with this one. Let $$\tdA=\mat{A^T\\ -A^T\\ -I_m},\tdA\in\bbR^{(2n+m)\times m}\qquad \tdc=\mat{c\\ -c\\ 0},\tdc\in\bbR^{2n+m}\qquad \tdb=-b$$Then the above LP is basically the following 	\begin{maxi*}{}{\tdb^Ty}{}{}
+		\addConstraint{}{\tdA y\leq \tdc}{\quad y\in\bbR^m}
+	\end{maxi*}Hence the dual of this LP is 	\begin{mini*}{}{\tdc^Tz}{}{}
+		\addConstraint{}{\tdA^Tz=\tdb}{\quad z\in\bbR^{2n+m}}
+		\addConstraint{}{z\geq 0}{}
+	\end{mini*}Let $z=\mat{ p & q & r}^T$ where $p,q\in bbR^n$ and $r\in\bbR^m$ and let $r_i$ denote the $i^{th}$ coordinate of $r$ for $i\in [m]$. . For any feasible solution $z$ of the LP $Ap-Aq-r=-b\iff A(q-p)+r=b$. Take $w=q-p$ then $$Ap-Aq-r=-b\iff A(q-p)+r=b\iff Aw+r=b$$Since $r\geq 0$ we have $Aw\leq b$. And we have the minimize $$\tdc^z=c^Tp-\tdc^Tq=c^T(p-q)$$Hence it is equivalent to maximize $c^Tw$. Since final cost vector doesn't depend on the vector $r$ we can disregard $r$ from the constraints and replace with $Aw\leq r$. Therefore the above LP is equivalent to  \begin{maxi*}{}{c^Tw}{}{}
+		\addConstraint{}{A w\leq b}{\quad w\in\bbR^n}
+	\end{maxi*}This is LP is exactly the primal LP. Hence the dual of dual LP is the primal LP.
+\end{proof-of-lemma}
+
+But if the primal LP is not in the canonical form then we have two options: either we can convert the primal to the canonical form and the dualize it or we can directly dualize the primal LP. The following method gives us a way to dualize the primal LP without converting it tot the canonical form.
+
+\begin{center}
+	\begin{minipage}{0.45\textwidth}
+		\begin{maxi*}
+			{}{c^Tx}{}{}
+			\addConstraint{A_jx}{\geq b_j}{\quad\forall\ j\in[d]}
+			\addConstraint{A_jx}{= b_j}{\quad\forall\ j\in\{d+1,\dots, m\}}
+			\addConstraint{x_i}{\geq 0}{\quad\forall\ i\in[k]}
+			\addConstraint{x_i}{\text{ is free}}{\quad\forall\ i\in\{k+1,\dots, n\}}
+		\end{maxi*}
+		\begin{center}
+			$\boxed{\text{Primal}}$
+		\end{center}
+	\end{minipage}	$\iff$\hspace{5mm} \begin{minipage}{0.4\textwidth}
+	\begin{mini*}
+		{}{b^Ty}{}{}
+		\addConstraint{\sum_{j=1}^mA_{ji}y_j}{\leq c_i}{\quad\forall\ i\in[k]}
+		\addConstraint{\sum_{j=1}^mA_{ji}y_j}{= c_j}{\quad\forall\ i\in\{k+1,\dots, n\}}
+		\addConstraint{y_j}{\geq 0}{\quad\forall\ j\in[d]}
+			\addConstraint{y_j}{\text{ is free}}{\quad\forall\ i\in\{d+1,\dots, m\}}
+	\end{mini*}
+	\begin{center}
+		$\boxed{\text{Dual}}$
+	\end{center}
+\end{minipage}
+\end{center}
+So we have the following observations:
+\begin{observation*}In dualization of a LP which is not in canonical form
+	\begin{center}
+		\begin{tabular}{rcl}
+			\underline{Primal} &&\underline{Dual}\\
+			Non-negative variables & $\iff$ & Inequality constraints\\
+			Free variables & $\iff$ & Equality constraints
+		\end{tabular}
+	\end{center}
+\end{observation*}
+\subsection{Weak and Strong Duality} 
+Now as the motivation for constructing the dual LP. We have the following theorem which proves the any feasible solution of the dual LP indeed gives a lower bound on the optimal solution of the primal LP.
+\begin{Theorem}{Weak Duality Theorem}{weak-duality}
+If $x,y$ are feasible solutions for the primal and dual LPs respectively and then $c^Tx\geq b^Ty$.
+\end{Theorem}
+\begin{proof}
+	We have \begin{align*}
+		b^T\leq \sum\limits_{j=1}^d y_j(A_j x)+\sum\limits_{j=d+1}^m y_j(A_j x)=\sum\limits_{j=1}^dy_jA_jx=\sum\limits_{j=1}^m\sum\limits_{i=1}^n y_j A_{ji}x_i=\sum\limits_{i=1}^n x_i\sum\limits_{j=1}^m A_{ji}y_j\leq \sum\limits_{i=1}^m x_ic_i=c^x
+	\end{align*}Hence we have the theorem.
+\end{proof}
+
+We also have a much stronger theorem which tells us that the optimal solutions of the primal and dual LPs are equal. 
+\begin{Theorem}{Strong Duality Theorem}{strong-duality}
+	Let the primal and dual LP are feasible and $x^*,y^*$ are the optimal solutions of the primal and dual LPs respectively. Then $c^Tx^*=b^Ty^*$.
+\end{Theorem}
+Notice that if for any feasible solution $y$ of the dual LP is $c^Tx^*=b^Ty$ then $y$ must be the optimal solution of the dual LP. 
+\subsection{Complementary Slackness}
+\begin{question}{}{}
+	Suppose we have optimal solutions $x^*,y^*$ of the primal and dual LPs respectively. What can be said about which constraints are tight in the primal and dual?
+\end{question}
+\begin{Theorem}{Complementary Slackness}{complementary-slackness}
+	Let $x^*,y^*$ be the optimal solutions of the primal and dual LPs respectively iff:
+	\begin{enumerate}[label=(\roman*)]
+		\item If $A_jx^*>b_j$ then $y_j^*=0$.
+		\item If ${A^i}^Ty^*<c_i$ then $x_i^*=0$.
+	\end{enumerate}
+\end{Theorem}
+\begin{proof}
+	Suppose $x^*,y^*$ are the optimal solutions of the primal and dual LPs respectively. Then by \hyperref[th:strong-duality]{Strong Duality Theorem}  we have $$\sum\limits_{i=1}^k x_i\sum\limits_{j=1}^m A_{ji}y_j+\sum\limits_{i=k+1}^n x_i\sum\limits_{j=1}^m A_{ji}y_j=\sum\limits_{i=1}^k x_ic_i+\sum\limits_{i=k+1}^n x_ic_i$$So we have $$\sum\limits_{i=1}^k x_i\sum\limits_{j=1}^m A_{ji}y_j=\sum\limits_{i=1}^k x_ic_i$$Hence either $x_i=0$ or $\sum\limits_{j=1}^m A_{ji}y_j=c_i$ for all $i\in[k]$. So ${A^i}^Ty^*<c_i$ implies $x_i^*=0$. Similarly we have $A_jx^*>b_j$ then $y_j^*=0$.
+\end{proof}
+
+There is also a relaxed version of the complementary slackness theorem, \thmref{relaxed-cs} which is useful in practice. It is explained in the next chapter.
+\subsection{Max-Flow Min-Cut Theorem}\label{another-proof-max-flow-min-cut}
+So here using LP-duality we give another proof of \hyperref[th:maxflowmincut]{Max-Flow Min-Cut Theorem}. The LP for maximum flow is given by:
+\begin{maxi*}
+	{}{\sum\limits_{e\in \textit{out}(s)}x_e}{}{}
+	\addConstraint{\sum\limits_{e\in\textit{in}(v)}x_e-\sum\limits_{c\in\textit{out}(v)}x_e}{=0}{\quad \forall \ v\in V, v\neq s,t}
+	\addConstraint{c_e}{\geq x_e}{\quad \forall\ e\in E}
+	\addConstraint{x_e}{\geq 0}{\quad \forall\ e\in E}
+\end{maxi*}We can convert this LP by adding  edges of $in(s)$ and giving them capacity $0$. So we have the modified LP: 
+\begin{maxi*}
+	{}{\sum\limits_{e\in \textit{out}(s)}x_e-\sum\limits_{e\in \textit{in}(s)}x_e}{}{}
+	\addConstraint{\sum\limits_{e\in\textit{in}(v)}x_e-\sum\limits_{c\in\textit{out}(v)}x_e}{=0}{\quad \forall \ v\in V, v\neq s,t}
+	\addConstraint{c_e}{\geq x_e}{\quad \forall\ e\in E}
+	\addConstraint{x_e}{\geq 0}{\quad \forall\ e\in E}
+\end{maxi*}For the first constraint we have the variables $\alpha_v$ and for the second constrain we have the variables $\beta_e$. So the dual of this LP is given by:\begin{mini*}
+	{}{\sum_{e\in E}c_e\beta_e}{}{}
+	\addConstraint{-\alpha_u+\alpha_v+\beta_e}{\geq 0}{\quad \forall\ e=(u,v)\in E, u,v\notin \{s,t\}}
+	\addConstraint{\alpha_v}{\geq 0}{\quad \forall\ v\in V, v\neq s,t}
+	\addConstraint{\beta_e}{\geq 0}{\quad \forall\ e\in E}
+\end{mini*}Now  we can add $\alpha_s=1$ and $\alpha_t=0$ to the dual LP and obtain the modified dual LP:
+\begin{mini*}
+	{}{\sum_{e\in E}c_e\beta_e}{}{}
+	\addConstraint{\beta_e}{\geq \alpha_u-\alpha_v+}{\quad \forall\ e=(u,v)\in E, u,v\notin \{s,t\} }
+	\addConstraint{\alpha_v}{\geq 0}{\quad \forall\ v\in V, v\neq s,t}
+	\addConstraint{\beta_e}{\geq 0}{\quad \forall\ e\in E}
+	\addConstraint{\alpha_s}{=1}{}
+	\addConstraint{\alpha_t}{=0}{}
+\end{mini*}
+Now for the max-flow LP we already proved in \lmref{max-flow-polytope-integral} that the polytope is integral. By \lmref{tum-prop} the polytope for the dual is also integral. Let $x^*,(\alpha^*,\beta^*)$ be the optimal solution of the primal and dual LPs respectively. Now by \hyperref[th:complementary-slackness]{Complementary Slackness} we have the following: $$x_e^*>0\implies \beta_e^*=\alpha_u^*-\alpha_v^*\qquad \text{and}\qquad \beta_e^*>0\implies x_e^*=c_e$$Now $\alpha_s^*=1$. Let $X=\{v\colon \alpha_v^*\geq 1\}$. Then $s\in X$ and $t\notin X$. Hence $X$ is a $s-t$ cut. Now consider an edge $(u,v)$ out of $X$. Then $$\alpha_u^*\geq 1\text{ and }\alpha_v^*<1\implies \beta_e^*>0\implies x_e^*=c_e$$And for an edge $e=(u,v)$ in to $X$ $$x_e^*>0,\alpha_u^*<1, \alpha_v^*\geq 1\implies \beta_e^*<0$$ Hence for an edge $e$ into $X$, $x_e^*=0$. Hence maximum flow is equal to the $\sum\limits_{e\in \textit{out}(X)} c_e$ and this is the minimum cut. 
+\subsection{Maximum Bipartite Matching minimum Vertex Cover}
+The maximum bipartite matching problem is given by the following LP:
+\begin{maxi*}
+	{}{\sum\limits_{e\in E}x_e}{}{}
+	\addConstraint{}{ \sum\limits_{e\text{ incident on }v}{x_e\leq 1}}{\quad \forall \ v\in V}
+	\addConstraint{}{x_e\geq 0}{\quad \forall\ e\in E}
+\end{maxi*}The dual of the LP si given by \begin{mini*}
+	{}{\sum\limits_{v\in V}y_v}{}{}
+	\addConstraint{y_u+y_v}{\geq 1}{\quad \forall \ (u,v)\in E}
+	\addConstraint{y_v}{\geq 0}{\quad \forall \ v\in V}
+\end{mini*}Since  in \lmref{bp-max-matching-polytope-integral} we have proved the polytope for bipartite maximum matching is integral the polytope for the dual is also integral.
+\begin{Definition}{Vertex Cover}{}
+	Given $G=(V,E)$ a vertex cover is a subset $C\subseteq V$ such that $\forall\ e\in E$ at least one of the endpoints of $e$ is in $C$. 
+\end{Definition}
+Then we have the following lemma:
+\begin{lemma}{}{}
+	Let $C$ be a vertex cover. Then there exists a dual feasible solution $y$ such that $\sum\limits_{v}y_v=|C|$.
+\end{lemma}
+\begin{proof}
+	Consider the vector $y\in\{0,1\}^{|V|}$ such that $y_v=1$ if $v\in C$ and $y_v=0$ otherwise. Then we have the lemma.
+\end{proof}
+\begin{lemma}{}{}
+	Let $y$ be an integral dual solution. Then $C=\{v\colon y_v\geq 1\}$ is a vertex cover.
+\end{lemma}
+\begin{proof}
+	For every edge $e=(u,v)$ we have $y_u+y_v\geq 1$. So either $y_u\geq 1$ or $y_v\geq 1$ as $y$ is integral. Hence either $u\in C$ or $v\in C$. Hence every edge is covered by $C$ and hence $C$ is a vertex cover.
+\end{proof}
+\nt{In general graphs computing a minimum sized vertex cover in $\mathsf{NP}$-hard. But since for bipartite graph  the polytope is integral we can compute minimum weight vertex cover in polynomial time.}

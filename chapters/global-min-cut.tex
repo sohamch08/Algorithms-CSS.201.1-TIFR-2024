@@ -1,0 +1,161 @@
+\chapter{Global Min Cut}
+\begin{algoprob}
+	\problemtitle{Global Min Cut}
+	\probleminput{Undirected graph $G=(V,E)$}
+	\problemquestion{Find cut $(S,V\setminus S)$ that minimizes $|\dl(S)|$ where $\dl(S)=\{e=(u,v)\mid u\in S, v\notin S\}$.}
+\end{algoprob}
+\section{Naive Algorithm}
+In previous chapter we have seen the algorithm to find $s-t$ min cut given any $s,t\in V$ in $O(n^2\sqrt{m})$ time. So naively we can run over all possible vertex pairs $(s,t)$ and output the global min cut in $O(n^4\sqrt{m})$ time.
+
+Or we can fix a vertex $s\in V$ and then for all $t\in V$ we can find the $s-t$ min cut and output the minimum. This takes $O(n^3\sqrt{m})$ time.
+\section{Karger's GMC Algorithm}
+Instead of naively solving the problem like above we will use randomization and will construct an algorithm which will output a global min-cut with high probability using edge contraction.
+\begin{Definition}{Edge Constraction}{}
+	Given a graph $G=(V,E)$, $e=(u,v)$ edge contraction gives a multigraph (graph with multiple edges between two vertices but no self-loops) $G\setminus e=(V',E')$ where $V'=V\setminus\{u,v\}\cup \{v_e\}$ and for all $e'\in E$ if $e\cap e'=\emptyset$ then $e'\in E$ and otherwise $e'=(w,u)$ then $(w,v_e)\in E'$. The vertex $v_e$ is called the supernode.
+
+	\begin{center}
+		\begin{tikzpicture}[
+				vertex/.style={circle, draw, inner sep=0pt, minimum size=1mm},
+				contractVertex/.style={rectangle, draw=red!80!black, inner sep=0pt, minimum size=1mm},
+				simpleedge/.style={thick},
+				contractedge/.style={red, thick, dashed},
+				scale=1
+			]
+			\begin{scope}
+				\node[vertex, label=left:{$a$}] (a) at (0,0) {};
+				\node[vertex, label=above:{$b$}] (b) at (1.3,1.2) {};
+				\node[vertex, label=below:{$c$}] (c) at (1.6,-0.1) {};
+				\node[vertex, label=above:{$d$}] (d) at (3,0.5) {};        \node[vertex, label=below:{$e$}] (e) at (3,-0.5) {};
+				\node[vertex, label=above:{$f$}] (f) at (4,0) {};
+				\draw (a) -- (b) -- (c) -- (a) -- cycle;
+				\draw (c) -- (d) -- (e) -- (c) -- cycle;
+				\draw (d) -- (f) -- (e) ;
+			\end{scope}
+			\begin{scope}[shift={(6,0)}]
+				\node at (0,0) {$\Longrightarrow$};
+			\end{scope}
+			\begin{scope}[shift={(8,0)}]
+				\node[vertex, label=left:{$a$}] (a1) at (0,0) {};
+				\node[vertex, label=above:{$b$}] (b1) at (1.3,1.2) {};
+				\node[vertex, label=below:{$c$}] (c1) at (1.6,-0.1) {};
+				\node[vertex, label=above:{$f$}] (f1) at (4,0) {};
+				\node[contractVertex, label=above:{$v\st_{de}$}, fill=red!80!black] (v) at (3,-0.25) {};
+				\draw (a1) -- (b1) -- (c1) -- (a1) -- cycle;
+				\draw[red!80!black, bend left=15] (c1) to (v);
+				\draw[red!80!black, bend right=15] (c1) to (v);
+				\draw[red!80!black, bend left=15] (v) to (f1);
+				\draw[red!80!black, bend right=15] (v) to (f1);
+			\end{scope}
+		\end{tikzpicture}
+	\end{center}
+\end{Definition}
+
+\begin{observation*}For any edge $e\in G$:
+	\begin{itemize}
+		\item Any cut in $G\setminus e$ is also a cut in $G$ of same size.
+		\item Size of min cut in $G\setminus e$ is at least the size of min cut in $G$.
+		\item Any cut in $G$ that does not separate vertices of $e$ is also cut in $G\setminus e$.
+	\end{itemize}
+\end{observation*}
+
+Then we have the following lemma:
+\begin{lemma}{}{}
+	Say $k$ is the size of global min cut in $G'=(V',E')$ [$G$ possible a multigraph] i.e. $\exs\ S\subseteq V'$ such that $|\dl(S)|=k$. Then $\min \{\deg(v)\mid v\in V'\}\geq k$ and $|E'|\geq \frac{k}{2}|V'|$.
+\end{lemma}
+\begin{proof}
+	If any vertex $v\in V'$ has degree less than $k$ then we can take the cut $(\{v\}, V'\setminus\{v\})$ then $|\dl(v)|<k$, but that contradicts the fact that size of global min cut is $k$. Hence, contradiction \ctr Therefore $\forall\ v\in V'$, $\deg(v)\geq k$. Therefore, $|E'|=\frac12\sum\limits_{v\in V'}\deg(v)\geq \frac{k}2\cdot |V'|$.
+\end{proof}
+
+So we at each round we will pick an edge from the graph uniformly at random and then contract that edge and in the next round we will pick an edge from the contracted graph. We will do $n-2$ such iterations since after that we are left with $2$ supernodes $(X,V\setminus X)$.
+\begin{algorithm}
+	\KwIn{Undirected graph $G=(V,E)$}
+	\KwOut{Find a cut $(S,V\setminus S)$ such that $|\dl(S)|$ is minimum}
+	\Begin{
+		$H\longleftarrow G$\;
+		\For{$i=1,\dots, n-2$}{
+			$e\longleftarrow $Picked uniformly at random from $E$\;
+			$H\longleftarrow H\setminus e$\;
+		}
+		\Return{$E(H)$}
+	}
+	\caption{Karger's GMC Algorithm}
+\end{algorithm}
+
+\begin{question}{}{}
+	What is the probability that the above algorithm returns a global min cut?
+\end{question}
+Let $(S,V\setminus S)$ is the global min cut with $|\dl(S)|=k$. Now probability that the algorithm returns $(S,V\setminus S)$ is equal to the probability that none of the edges in $\dl(S)$ is picked. So let $e_1,\dots, e_{n-2}$ are the edges that are picked in the $n-2$ iterations of the algorithm. We need to calculate $\bbP[e_i\notin \dl(S),\ \forall\ i\in[n-2]]$
+\begin{lemma}{}{}
+	$\bbP[e_1\notin \dl(S)]\geq 1-\frac2n$
+\end{lemma}
+\begin{proof}
+	We have $|\dl(S)|=k$. Hence, we have $|E|\geq \frac{n\cdot k}2$. Since $e_1$ is picked uniformly at random we have $$\bbP[e_1\notin \dl(S)]\geq 1-\frac{k}{\frac{nk}{2} }=1-\frac2n$$Hence we have the lemma.
+\end{proof}
+\begin{lemma}{}{prob-min-cut}
+	$\bbP[e_i\notin \dl(S)\mid e_1,\dots,e_{i-1}\notin \dl(S)]  \geq 1-\frac{2}{n-i+1}$
+\end{lemma}
+\begin{proof}
+	Let $e_1,\dots, e_{i-1}\notin \dl(S)$. Hence $S$ is still a min cut in $G\setminus\{e_1,\dots, e_{i-1}\}$. Then number of edges after contracting $e_1,\dots, e_{i-1}$ is at least $\frac{k(n-i+1)}2$. Therefore $$\bbP[e_i\notin \dl(S)\mid e_1,\dots,e_{i-1}\notin \dl(S)]1-\frac{k}{\frac{k(n-i+1)}2}=1-\frac2{n-i+1}$$Therefore we have the lemma.
+\end{proof}
+
+Hence we have \begin{align*}
+	\bbP[\text{Success}] & \geq \bbP[e_i\notin \dl(S),\ \forall\ i\in[n-2]]              \\
+	                     & =\prod\limits_{i=1}^{n-2}\lt(1-\frac{2}{n-i+1}\rt)            \\
+	                     & = \frac2{n(n-1)}=\dfrac{1}{\binom{n}{2}}=O\lt(\frac1{n^2}\rt)
+\end{align*}
+
+So we run the above algorithm $2n^2\log n$ times then take the cut which gives minimum size. Then we have \begin{align*}
+	\bbP[\text{Succeeds}] & =1-\bbP[\text{All $4n^2\log n$ runs fails}] \\
+	                      & \geq 1- \lt(1-\frac2{n^2}\rt)^{4n^2\log n}  \\
+	                      & \geq 1-\exp\lt[-\frac2{n^2}2n^2\log n\rt]   \\
+	                      & = 1-\frac1{n^4}
+\end{align*}
+
+Hence, this gives a much higher probability of success. So our final algorithm is
+\begin{algorithm}
+	\KwIn{Undirected graph $G=(V,E)$}
+	\KwOut{Find a cut $(S,V\setminus S)$ such that $|\dl(S)|$ is minimum}
+	\Begin{
+		$S\longleftarrow \emptyset$\;
+		$cutEdgeSize\longleftarrow|E|$\;
+		\For{$i\in[2n^2\log n]$}{
+			$H\longleftarrow G$\;
+			\For{$j=1,\dots, n-2$}{
+				$e\longleftarrow $Picked uniformly at random from $E$\;
+				$H\longleftarrow H\setminus e$\;
+			}
+			\If{$|E(H)|<cutEdgeSize$}{
+				Let $H=(X, V\setminus X)$\;
+				$S\longleftarrow X$\;
+				$cutEdgeSize\longleftarrow |E(H)|$\;
+			}
+		}
+		\Return{$S$}
+	}
+	\caption{Multiple run of Karger's GMC Algorithm}
+\end{algorithm}
+\section{Karger-Stein Algorithm}
+In Karger's algorithm the probability of getting a min cut is low because in later stages the probability of picking an edge from a min-cut is high because $$\bbP[e_i\in \dl(S)\mid e_1,\dots,e_{i-1}\notin \dl(S)]  \leq \frac{2}{n-i+1}\implies \bbP[e_1,\dots, e_i\notin \dl(S)]\geq \frac{\binom{n-i}2}{\binom{n}{2}}$$  If the above probability is at least $\frac12$ then $2(n-i)^2\geq n^2\implies n-i\geq \frac{n}{\sqrt{2}}$. Hence, $i$ can't be too high.
+
+So instead of running the entire algorithm $\tdO(n^2)$ times we can just run the later stages multiple times. So after $i\leq n-\frac{n}{\sqrt{2}}-1$ iterations of Karger's GMC algorithm we have $$\bbP[e_1,\dots, e_i\notin\dl(S)]\geq \frac{(n-i)(n-i-1)}{n(n-1)}\geq \frac{n^2}{2n(n-1)}\geq \frac12$$ from \lmref{prob-min-cut}. We also have the following lemma:
+\begin{lemma}{}{}
+	For any $1\leq i<j\leq n-2$ we have $$\bbP[e_i,e_{i+1},\dots, e_j\notin \dl(S)\mid e_1,\dots,e_{i-1}\notin \dl(S)]  \geq \frac{(n-j)(n-j-1)}{(n-i+1)(n-i)}$$
+\end{lemma}
+Now fix an $i\leq n-2$. Let $l=n-i+1$. Then For $j\leq n-\frac{l}{\sqrt{2}}-1$ we have $$\bbP[e_i,\dots, e_{i+j-1}\notin\dl(S)\mid e_1,\dots, e_{i-1}\notin \dl(S)]\geq \frac{l^2}{2l(l-1)}\geq \frac12$$So we have the following algorithm:
+\begin{algorithm}
+	\KwIn{Undirected graph $G=(V,E)$}
+	\KwOut{Find a cut $(S,V\setminus S)$ such that $|\dl(S)|$ is minimum}
+	\Begin{
+		\If{$|V|=2$}{\Return{Any vertex of $V$}}
+		Run Karger's GMC Algorithm on $H$ for $n-\frac{n}{\sqrt{2}}-1$ iterations.\;
+		Let $H$ be the resulting multigraph.\;
+		$S_1\longleftarrow \textsc{KS-Algorithm}($H$)$\;
+		$S_2\longleftarrow \textsc{KS-Algorithm}($H$)$\;
+		\Return{$\arg\min\{|S_i|\colon i\in[2]\}$}
+	}
+	\caption{KS-Algorithm}
+\end{algorithm}
+
+Let $p(n)$ the probability of success for KS-Algorithm for a graph with $n$ vertices. Then probability of not picking an edge until $\frac{n}{\sqrt{2}}+1$ nodes remain is $\geq \frac12$ as we have calculated above. Now the resulting graph has $\frac{n}{\sqrt{2}}+1$ nodes. Hence, probability that  $\textsc{KS-Algorithm}($H$)$ returns the min-cut is at least $\frac{1}2p\lt(\frac{n}{\sqrt{2}}+1\rt)$. Therefore, $$\bbP[\text{At least one of the run $\textsc{KS-Algorithm}($H$)$ returns the min cut}]\geq 1-\lt(1-\frac{1}2p\lt(\frac{n}{\sqrt{2}}+1\rt)\rt)^2$$Therefore we have $$p(n)\geq 1-\lt(1-\frac{1}2p\lt(\frac{n}{\sqrt{2}}+1\rt)\rt)^2$$Solving this recursion relation we have $p(n)\geq \frac1{\log n}$. Hence, to succeed with high probability we need to run $2\log ^2n$ times. 
+
+Now For each run of the KS-Algorithm we have the recursion relation $$T(n)\geq 2T\lt(\frac{n}{\sqrt{2}}+1\rt)+O(n^2)$$Solving the recursion relation we have $T(n)=O(n^2\log n)$. Therefore, the time complexity of the total running time is $O(n^2\log ^3n)$.

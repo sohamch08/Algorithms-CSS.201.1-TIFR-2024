@@ -1,0 +1,68 @@
+\chapter{Derandomization}
+In this section we will see a derandomization technique called Conditional Expectation. With this technique we will show derandomization of some randomized algorithms in the following sections.
+\section{Conditional Expectation}
+Let $\sA$ be a randomized algorithm which is successful with probability at least $\frac23$. Suppose $\sA$ uses $m$ random bits and suppose the random bits are $R_1,\dots , R_m$. Then we have $$\underset{R_1,\dots, R_m}{\bbP}[\sA(x,R_1,\dots, R_m)=\text{Correct}]\geq \frac23$$We want to derandomize $\sA$.
+
+Now think of $\sA$ as a binary tree which, given $x$, branches on the sampled value of each random bit $R_i$ where it goes to left child if the random bit takes value $0$ and goes to right child if the random bit takes value $1$. Every path in this tree from root to leaf corresponds to different possible random strings and the leaf nodes corresponds to the output of the algorithm with the corresponding random string. Since $\sA$ succeeds with probability at least $\frac23$ means that at least $\frac23$ of the leaves are good outputs for the input $x$.
+
+\begin{idea*}
+	To derandomize $\sA$ we need to find a deterministic algorithm that traverses from the root to a leaf which at any branch at level $i$ chooses a direction which leads to a good output.
+\end{idea*}
+
+Now suppose $r_1,\dots, r_m\in \{0,1\}$ denote the values taken by the random variables $R_1,\dots, R_m$. Now let $P(r_1,\dots, r_i)$ denote the fraction of the leaves of the subtree below the node obtained  by following the path $r_1,\dots, r_i$. Formally, $$P(r_1,\dots, r_i)=\bbP[\sA(x,R_1,\dots, R_m)\mid R_1=r_1,\dots, R_i=r_i]=\frac12P(r_1,\dots, r_i,0)+\frac12P(r_1,\dots, r_i,1)$$From the last equality it is clear that there is a choice $r_{i+1}$ such that $P(r_1,\dots, r_{i+1})\geq P(r_1,\dots, r_i)$. Therefore to find a good path in the tree it suffices at each branch to pick such an $r\in \{0,1\}$. Then we would have $$P(r_1,\dots,r_m)\geq P(r_1,\dots, r_{m-1})\geq \cdots\geq P(r_1)\geq \bbP[\sA(x, R_1,\dots, R_m)=\text{Correct}]\geq \frac23$$Since $P(r_1,\dots, r_m)$ is either 0 or 1 it must be 1.
+\section{\prb{Max-SAT}}
+\begin{algoprob}
+	\problemtitle{Max-SAT}
+	\probleminput{SAT formula $\vph$ with $n$ variables and $m$ clauses and non negative weights $w_c$ on clauses.}
+	\problemquestion{Given a SAT formula $\vph$ with $n$ variables and $m$ clauses and non negative weights $w_c$ on clauses find an assignment that maximizes weight of satisfied clauses.}
+\end{algoprob}
+
+We will first show a randomized algorithm for this problem. Then we will use conditional expectation to derandomize the algorithm.
+\subsection{Randomized Algorithm}
+First lets see what is the expected weight of satisfied clauses. Let $Y_c$ be the indicator random variable if clause $C$ is satisfied. Suppose there are $k$ variables in $C$. Then we have $\bbE[Y_c]=1-\frac1{2^k}\geq \frac12$. Therefore expected weight of satisfied clauses is $$\bbE\lt[\sum_{C}w_cY_c\rt]=\sum_Cw_c\bbE[Y_c]\geq \frac12\sum_Cw_c$$Let OPT be the optimal \prb{Max-SAT} solution for the given formula. Then we have $\sum\limits_Cw_c\geq \text{OPT}$.  Therefore $$\bbE\lt[\sum_{C}w_cY_c\rt]\geq \frac12\text{OPT}$$Hence we have the following randomized algorithm:
+
+\begin{algorithm}
+\DontPrintSemicolon
+\KwIn{SAT formula $\vph$ with $n$ variables and $m$ clauses and non negative weights $w_c$ on clauses.}
+\KwOut{Find an assignment that maximizes weight of satisfied clauses.}
+\Begin{\For{$i\in[n]$}{$x_i\longleftarrow$ Pick a value from $\{0,1\}$ uniformly at random}
+\Return{$x$}}
+\caption{\prb{2-Approximate Max-SAT}}
+\end{algorithm}
+
+By the above discussion we have an assignment with an expected weight of satisfied clauses at least half the maximum.
+\subsection{Derandomization}
+Now we want to derandomize  the algorithm using conditional expectation. Let $X_1,\dots, X_n$ denote the random variable for each variables and $x_1,\dots, x_n\in \{0,1\}$ denote the value the random variables took. A key step will be evaluate the conditional probabilities: $$\bbE\lt[\sum_Cw_cY_c\mid X_1=x_1,\dots, X_i=x_i\rt]=\sum_Cw_c\bbP[Y_c=1\mid X_1=x_1,\dots, X_i=x_i]\quad \forall\ i\in[n]$$Hence we have to find the value of $\bbP[Y_c=1\mid X_1=x_1,\dots, X_i=x_i]$, $\forall\ i\in[n]$. Now if the clause $C$ is already satisfied by the setting $x_1,\dots, x_i$ then $Y_C=1$. Else if $C$ has $r$ variables from $x_{i+1},\dots, x_n$ then $$\bbP[Y_c=1\mid X_1=x_1,\dots, X_i=x_i]=1-\frac1{2^r}$$. Now if at height $i$, we find $\bbE\lt[\sum_Cw_cY_c\mid X_1=x_1,\dots, X_i=0\rt]$ and $\bbE\lt[\sum_Cw_cY_c\mid X_1=x_1,\dots, X_i=1\rt]$ and which ever gives the higher value we will set the assignment for $X_i$ to be that one. Thus we can derandomize the algorithm.
+\section{Set Balancing}
+\begin{algoprob}
+	\problemtitle{Set-Balance}
+	\probleminput{$A\in \{0,1\}^{n\times n}$ matrix with $A_i$ is the $i^{th}$ row of $A$ and $A_{i,j}$ is the $(i,j)^{th}$ entry}
+	\problemquestion{Given $n\times n$, 0-1 matrix $A$ find $b\in \{1,-1\}^n$ to minimize $\|Ab\|_{\infty}=\max\limits_{i\in[n]}|A_ib|$.}
+\end{algoprob}
+
+In the following sections we will not optimize on $\|Ab\|_{\infty}$. Instead we will give bound on how large $\min \|Ab\|_{\infty}$ can be for any $A$.
+
+\subsection{Randomized Algorithm}
+\begin{algorithm}
+	\DontPrintSemicolon
+	\KwIn{$A\in \{0,1\}^{n\times n}$ matrix}
+	\KwOut{Find an $b\in \{1,-1\}^n$ to minimize $\|Ab\|_{\infty}$}
+	\Begin{\For{$i\in[n]$}{$x_i\longleftarrow$ Pick a value from $\{1,-1\}$ uniformly at random}
+		\Return{$x$}}
+	\caption{\prb{Set-Balancing}}
+\end{algorithm}
+Clearly for each row $i\in[n]$ we have $$\bbE[A_ib]=\bbE\lt[\sum_jA_{i,j}b_j\rt]=\sum_j\bbE[A_{i,j}b_j]=0$$But that does not mean $\bbE[|A_ib|]=0$. To get a bound on $\bbE[|A_ib|]$ we will use Hoeffding's Inequality
+
+\begin{Theorem}{Hoeffding's Inequality}{}
+	Let $Y_1,\dots, Y_n$ be independent random variables with bounded supposer $[l_i,u_i]$ for $Y_i$ and let $Y=\sum\limits_{i=1}^n Y_i$. Then for any $\dl>0$ $$\bbP[|Y-\bbE[Y]|>\dl]\leq 2e^{-\frac{2\dl^2}{\sum\limits_i(u_i-l_i)^2}}$$
+\end{Theorem}
+
+In our case we have $Y_{i,j}=A_{i,j}b_j$ and $Y_i=\sum\limits_j A_{i,j}b_j$. Then each $Y_{i,j}\in \{-1,0,1\}$, $\bbE[Y_{i,j}]=0$ and $\bbE[Y_i]=0$. Therefore $$\bbP[|Y_i|>\dl]\leq 2e^{-\frac{2\dl^2}{4n}}$$Now we choose $\dl=2\sqrt{n\ln n}$ $$\bbP[|A_ib|\geq 2\sqrt{n\ln n}]\leq \frac{2}{n^2}$$Therefore $\bbP[\|Ab\|_{\infty}\geq 2\sqrt{n\ln n}]\leq \frac2{n}$ by union bound. Hence choosing each entry $b$ uniformly at random from $\pm 1$ we can obtain $\|Ab\|_{\infty}\leq 2\sqrt{n\ln n}$ with high probability.
+\subsection{Derandomization}
+Again we will use conditional expectation to derandomize the algorithm. Let a node at height $j$ corresponds to a setting of $b_1, \dots, b_j$ and we will calculate $\bbP[\|Ab\|_{\infty}>2\sqrt{n\ln n}\mid b_1,\dots, b_j]$. Now consider a leaf corresponding to some choice of $b_1,\dots, b_n$ such that the value of the leaf is $<1$.  But there is no randomness at the leaf. Then $\bbP[\|Ab\|_{\infty}>2\sqrt{n\ln n}\mid b_1,\dots, b_n]=0$. Hence for this choice of $b_1,\dots, b_n$ it must have $\|Ab\|_{\infty} \leq 2\sqrt{n\ln  n}$. Now $$\bbP[\|Ab\|_{\infty}>2\sqrt{n\ln n}\mid b_1,\dots, b_j]=\bbP[\|Ab\|_{\infty}>2\sqrt{n\ln n}\mid b_1,\dots, b_j,0]+\bbP[\|Ab\|_{\infty}>2\sqrt{n\ln n}\mid b_1,\dots, b_j,1]$$One of them have $$\bbP[\|Ab\|_{\infty}>2\sqrt{n\ln n}\mid b_1,\dots, b_j,b_{j+1}]\leq \bbP[\|Ab\|_{\infty}>2\sqrt{n\ln n}\mid b_1,\dots, b_j]$$So we choose that one. Also note that at the root $\bbP[\|Ab\|_{\infty}>2\sqrt{n\ln n}]<\frac2n$. Then for choosing such a path for the corresponding choice of $b$ we will have $\|Ab\|_{\infty}\leq M=2\sqrt{n\ln n}$. But this depends on being able to calculate $\bbP[\|Ab\|_{\infty}>M\mid b_1,\dots, b_j]$ which we don't know how to do in polynomial time. Instead we will use pessimistic estimator which.
+\subsection{Using Pessimistic Estimator to Derandomize}
+Instead of $\bbP[\|Ab\|_{\infty}>M\mid b_1,\dots, b_j]$ we will use $\sum\limits_{i\in [n]}\bbP[|A_ib|>M\mid b_1,\dots, b_j]$. Naturally we have $$\sum\limits_{i\in [n]}\bbP[|A_ib|>M\mid b_1,\dots, b_j]\geq \bbP[\|Ab\|_{\infty}>M\mid b_1,\dots, b_j]$$Now we know how to calculate $\bbP[|A_ib|>M\mid b_1,\dots, b_j]$. For any $i\in [n]$ we have $$\bbP[|A_ib|>M\mid b_1,\dots, b_j]=\sum_{k=M+1}^n \bbP[A_ib=k\mid b_1,\dots, b_j]+\bbP[A_ib=-k\mid b_1,\dots, b_j]$$
+
+Let $S_i=\{j'>j\colon A_{i,j'}=1\}$ and $l=\sum\limits_{j'\leq j}A_{i,j'}$. Then $$ \bbP[A_ib=k\mid b_1,\dots, b_j]=  \bbP\lt[\sum\limits_{j'\in S_i}b_{j'}=k-l\rt]$$Let in $S_i$ $n_i$ coordinates of $b$ are $1$ and rest of the coordinates of $b$ in $S_i$ are $-1$. Then $$\sum_{j'\in S_i}b_{j'}=2n_i-|S_i|=k-l\implies n_i=\frac12(k-l+|S_i|)$$Therefore we have $$\bbP[A_ib=k\mid b_1,\dots, b_j]=\frac1{2^{|S_i|}}\binom{|S_i|}{\frac12(k-l+|S_i|)}$$Thus we can calculate $\bbP[A_ib=k\mid b_1,\dots, b_j]$ for all $n\geq |k|>M$. Therefore we can calculate $\bbP[|A_ib|>M\mid b_1,\dots, b_j]$ and henceforth $\sum\limits_{i\in [n]}\bbP[|A_ib|>M\mid b_1,\dots, b_j]$. With this pessimistic estimator we calculate at height $j$ both $\sum\limits_{i\in [n]}\bbP[|A_ib|>M\mid b_1,\dots, b_j,b_{j+1}=0] $ and $\sum\limits_{i\in [n]}\bbP[|A_ib|>M\mid b_1,\dots, b_j,b_{j+1}=1]$ and the one which have value less than 1 we will follow that path and eventually we will get an assignment of $b$ for which $\|Ab\|_{\infty}\leq 2\sqrt{n\ln n}$. 
+
+
