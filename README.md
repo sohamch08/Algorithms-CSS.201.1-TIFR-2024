@@ -51,7 +51,5 @@ The primary references for the course were:
 
 These lecture notes were typeset in LaTeX using a **custom eye-candy theme** developed by the me:
 
-- [Notes Source Code](https://github.com/sohamch08/Academic-Notes/tree/master/Course%20Lecture%20Notes/Algorithms)
-- [Custom Theme Repository](https://github.com/sohamch08/Eye-Candy-Lecture-Notes-Theme)
+- [Eye Candy Theme Repository](https://github.com/sohamch08/Eye-Candy-Lecture-Notes-Theme)
 
----
