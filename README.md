@@ -49,18 +49,9 @@ The primary references for the course were:
 
 ## 🎨 Typesetting & Theme
 
-These lecture notes were typeset in LaTeX using a **custom eye-candy theme** developed by the author:
+These lecture notes were typeset in LaTeX using a **custom eye-candy theme** developed by the me:
 
 - [Notes Source Code](https://github.com/sohamch08/Academic-Notes/tree/master/Course%20Lecture%20Notes/Algorithms)
 - [Custom Theme Repository](https://github.com/sohamch08/Eye-Candy-Lecture-Notes-Theme)
 
 ---
-
-## 📌 How to Use
-
-Clone the repository:
-
-```bash
-git clone https://github.com/sohamch08/CSS.201.1-Algorithms-2024.git
-cd CSS.201.1-Algorithms-2024
-
