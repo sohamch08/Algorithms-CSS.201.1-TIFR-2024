@@ -11,7 +11,7 @@ The course focuses on the **design and analysis of algorithms**, exploring class
 Key topics include divide-and-conquer strategies, dynamic programming, greedy algorithms, graph algorithms, randomized methods, approximation techniques, and complexity theory.
 
 **Instructor:** [Prof. Umang Bhaskar](https://www.tcs.tifr.res.in/~umang/)  
-**Scribe & Notes Author:** Soham Chatterjee  
+**Scribe & Notes Author:** [Soham Chatterjee](https://sohamch08.github.io/)
 **Semester:** August – November 2024  
 **Institute:** Tata Institute of Fundamental Research (TIFR)  
 **Official Course Page:** [https://www.tcs.tifr.res.in/~umang/algos24.html](https://www.tcs.tifr.res.in/~umang/algos24.html)
