@@ -1,4 +1,25 @@
-# CSS.201.1 — Algorithms (TIFR, 2024)
+<!-- Banner -->
+<p align="center">
+  <a href="https://www.tifr.res.in" target="_blank">
+    <img src="https://img.shields.io/badge/TIFR-Algorithms-0047AB?style=for-the-badge&logo=latex&logoColor=white" alt="Course Badge">
+  </a>
+</p>
+
+<h1 align="center">CSS.201.1 — Algorithms</h1>
+
+<p align="center">
+  <a href="Algorithms.pdf">
+    <img src="https://img.shields.io/badge/PDF-Download-red?style=for-the-badge&logo=adobeacrobatreader&logoColor=white" alt="Download PDF">
+  </a>
+  <a href="https://sohamch08.github.io">
+    <img src="https://img.shields.io/badge/Website-sohamch08.github.io-1E90FF?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Website">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge&logo=open-source-initiative&logoColor=white" alt="License">
+  </a>
+</p>
+
+---
 
 This repository contains lecture notes, assignments, and resources for the **CSS.201.1 Algorithms** course conducted at the **Tata Institute of Fundamental Research (TIFR)** during the **August–November 2024** semester.  
 The course was instructed by **Prof. Umang Bhaskar**, and these notes were scribed and compiled by **Soham Chatterjee**.
