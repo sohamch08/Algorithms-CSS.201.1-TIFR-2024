@@ -1,6 +1,6 @@
 <!-- Banner -->
 <p align="center">
-  <a href="https://www.tifr.res.in" target="_blank">
+  <a href="https://www.tcs.tifr.res.in/~umang/algos24.html" target="_blank">
     <img src="https://img.shields.io/badge/TIFR-Algorithms-0047AB?style=for-the-badge&logo=latex&logoColor=white" alt="Course Badge">
   </a>
 </p>
