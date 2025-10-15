@@ -8,7 +8,7 @@
 <h1 align="center">CSS.201.1 — Algorithms</h1>
 
 <p align="center">
-  <a href="Algorithms.pdf">
+  <a href="algorithms.pdf">
     <img src="https://img.shields.io/badge/PDF-Download-red?style=for-the-badge&logo=adobeacrobatreader&logoColor=white" alt="Download PDF">
   </a>
   <a href="https://sohamch08.github.io">
