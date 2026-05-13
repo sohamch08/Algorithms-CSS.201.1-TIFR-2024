@@ -5,7 +5,7 @@ In this chapter we will study some approximation algorithms using linear program
 	\problemtitle{$\prb{Set Cover}$}
 	\probleminput{$\mcU$: Universe of all elements $u_1,\dots, u_n$
 
-		$\mcS=\{S_1,\dots, S_m\}$, $S_i\subseteq \mcU$ forall $i\in[m]$
+		$\mcS=\{S_1,\dots, S_m\}$, $S_i\subseteq \mcU$ for all $i\in[m]$
 
 		Function $c:\mcS\to\bbZ_0$}
 	\problemquestion{Given $\mcU,\mcS$ and the function $c$ find $T\subseteq [m]$ such that $\bigcup\limits_{i\in T}S_i=\mcU$ to minimize the total cost $c(T)=\sum\limits_{i\in T}c(S_i)$ }
@@ -198,7 +198,7 @@ Hence, the probability that $e$ is covered is at least $1-\frac{1}{n^2}$. Theref
 $$\bbP\lt[C\text{ is not a set cover OR cost of C}\geq 6\log n\sum\limits_{S\in\mcS}c(S)x^*_S\rt]\leq \frac1n+\frac13\leq \frac12$$Therefore $$\bbP\lt[C\text{ is  set cover AND }c(S)\leq 6\log n\sum\limits_{S\in\mcS}c(S)x^*_S\rt]\geq \frac12$$Hence with probability at least $\frac12$ we have a set cover $C$ such that $c(C)\leq 6\log n\sum\limits_{S\in\mcS}c(S)x^*_S$ which gives us an $O(\log n)$-approximation algorithm for Set Cover problem.\parinn
 
 
-\nt{$O(\log n)$-approximatiobn is also the best we can do for set cover. Doing better than that is $\mathsf{NP}$-hard.}
+\nt{$O(\log n)$-approximation is also the best we can do for set cover. Doing better than that is $\mathsf{NP}$-hard.}
 
 
 \newpage

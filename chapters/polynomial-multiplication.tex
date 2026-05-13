@@ -55,7 +55,7 @@ Suppose we were given $A(x)$ and $B(x)$ evaluated at $2n-1$ distinct points $x_0
 \begin{question}{}{}
 	Suppose there is only one point, $x_0$. Can we evaluate an $n-1$ degree polynomial $A(x)=\sum\limits_{i=0}^{n-1}a_ix^i$ at $x_0$ efficiently?
 \end{question}
-We can rewrite $A(x)$ as $$A(x)=a_0+x(a_1+x(a_2+x(a_3+\cdots (a_{n-1}+x(a_n))\cdots )))$$In this represent it is clear that we have to do $n$ additions and $n$ multiplications to find $A(x_0)$. Hence, we can evaluate an $n-1$ degree polynomial at a point in $O(n)$ time
+We can rewrite $A(x)$ as $$A(x)=a_0+x(a_1+x(a_2+x(a_3+\cdots (a_{n-1}+x(a_n))\cdots )))$$In this representation it is clear that we have to do $n$ additions and $n$ multiplications to find $A(x_0)$. Hence, we can evaluate an $n-1$ degree polynomial at a point in $O(n)$ time
 
 
 But we have $O(n)$ points. And if each point takes $O(n)$ time to find the evaluation of the polynomial then again it will take total $O(n^2)$ time. We are back to square one. So instead we will evaluate the polynomial in some special points, and we will evaluate in all of them in $O(n\log n)$ time. So now the problem we will discuss now is to find some special $n$ points where we can evaluate an $n-1$-degree polynomial in $O(n\log n)$ time.
@@ -66,7 +66,7 @@ But we have $O(n)$ points. And if each point takes $O(n)$ time to find the evalu
 
 Assume $n$ is a power of 2. We have the polynomial $A(x)=\sum\limits_{i=0}^{n-1}a_ix^i$. So now consider the following two polynomials $$A_0(x)=a_0+a_2x+a_4x^2+\cdots+a_{n-2}x^{\frac{n}2-1}\qquad A_1(x)=a_1+a_3x+a_5x^2+\cdots+a_{n-1}x^{\frac{n}2-1}$$Certainly we have $$A(x)=A_0(x^2)+xA_1(x^2)$$Hence we can get $A(1)$ and $A(-1)$ by $$A(1)=A_0(1)+A_1(1)\qquad A(-1)=A_0(1)-A_1(1)$$Hence like this by evaluating two $\frac{n}2-1$ degree polynomials at one point we get evaluation of $A$ at two points. More generally for any $y\geq 0$ we have$$A(\sqrt{y})=A_0(y)+\sqrt{y}A_1(y)\qquad A(-\sqrt{y})=A_0(y)-\sqrt{y}A_1(y)$$So by recursing like this evaluating at $1,-1$ we can get evaluations of $A$ at $n^{th}$ roots of unity.
 
-Let $$\om_n^k=n^{th}\text{ root of unity for }k\in\llbracket n-1\rrbracket = e^{i\frac{k}{n}2\pi}=\cos\lt(\frac{k}{n}2\pi\rt)+i\sin s\lt(\frac{k}{n}2\pi\rt)$$Hence we have \begin{align*}
+Let $$\om_n^k=n^{th}\text{ root of unity for }k\in\llbracket n-1\rrbracket = e^{i\frac{k}{n}2\pi}=\cos\lt(\frac{k}{n}2\pi\rt)+i\sin\lt(\frac{k}{n}2\pi\rt)$$Hence we have \begin{align*}
 	A\lt(\om_n^k\rt)                               & =A_0\lt(\om_n^{2k}\rt)+\om_n^kA_1\lt(\om_n^{2k}\rt)=A_0\lt(\om_{\frac{n}2}^{k}\rt)+\om_n^kA_1\lt(\om_{\frac{n}2}^{k}\rt) \\
 	A\lt(-\om_n^k\rt)=A\lt(\om_n^{\frac{n}2+k}\rt) & =A_0\lt(\om_n^{2k}\rt)-\om_n^kA_1\lt(\om_n^{2k}\rt)=A_0\lt(\om_{\frac{n}2}^{k}\rt)-\om_n^kA_1\lt(\om_{\frac{n}2}^{k}\rt)
 \end{align*}Hence now we will solve the following problem:

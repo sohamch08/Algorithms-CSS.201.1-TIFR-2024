@@ -201,7 +201,7 @@ Now in the algorithm there are two things which we needed to keep track of. At e
 In the algorithm we called \textsc{Extract-Min} $n$ times and \textsc{Decrease-Key} $m$ times.\parinn
 
 \section{Data Structure 1: Linear Array}
-So naively we can use a linear array of size $n$ where each element of the array corresponds to a vertex. Each element of the array is a tuple of flag of being in $U$ and the value $dist(v)$. To \textsc{Extract-Min} it takes $O(n)$ time since we need to compare all the elements and for \textsc{Decrese-Key} it takes $O(1)$ time. Therefore Dijkstra takes $n\cdot O(n)+O(m)=O(n^2)$ time.
+So naively we can use a linear array of size $n$ where each element of the array corresponds to a vertex. Each element of the array is a tuple of flag of being in $U$ and the value $dist(v)$. To \textsc{Extract-Min} it takes $O(n)$ time since we need to compare all the elements and for \textsc{Decrease-Key} it takes $O(1)$ time. Therefore Dijkstra takes $n\cdot O(n)+O(m)=O(n^2)$ time.
 
 \section{Data Structure 2: Min Heap}
 A binary heap data structure is an array object that we can view as ``Almost complete binary'' tree (ACB tree). Each node of the tree corresponds to an element of the array. The tree is completely filled on all levels except possibly the lowest which is filled from the left up to a point.
@@ -242,13 +242,13 @@ For minimum, we already know the root of the heap or the first element of $A$ is
 		\If{$left-val\leq right-val$ and $A[i].\emph{key}<left-val$}{
 			$curr\_elm\longleftarrow A[i]$\;
 			$A[i]\longleftarrow A[2i]$\;
-			$U[2i]\longleftarrow curr\_elm$\;
+			$A[2i]\longleftarrow curr\_elm$\;
 			$i\longleftarrow 2i$
 		}
 		\ElseIf{$right-val<left-val$}{
 			$curr\_elm\longleftarrow A[i]$\;
 			$A[i]\longleftarrow A[2i+1]$\;
-			$U[2i+1]\longleftarrow curr\_elm$\;
+			$A[2i+1]\longleftarrow curr\_elm$\;
 			$i\longleftarrow 2i+1$
 		}
 		\Else{
@@ -561,8 +561,8 @@ To prove that the amortized time of \textsc{Fib-Extract-Min} and \textsc{Fib-Dec
 
 Now we will calculate the amortized time of Dijkstra algorithm. Before that we will calculate the amortized cost of the data structure. Let in an algorithm  \textsc{Fib-Extract-Min} was called $t$ times. Therefore, total cost of all $t$ many \textsc{Fib-Extract-Min} calls is $O(t\log n+\text{total $\#$heaps created})$. Now heaps are created because of \textsc{Fib-Extract-Min} functions and \textsc{Fib-Decrease-Key} function. We know \textsc{Fib-Extract-Min} were called $t$ times and each time it created $O(\log n)$ heaps. Hence, in total \textsc{Fib-Extract-Min} created $O(t\log n)$ heaps. Therefore, time taken by the $t$ many \textsc{Fib-Extract-Min} calls is $O(t\log n+\#\textsc{Fib-Decrease-Key}\text{ calls})$.
 
-Now suppose in that algorithm the function \textsc{Fib-Decrease-Key} were called $k$ times. Hence, this takes $O(k+\#\text{total number of \textsc{lost} bits reset})=O(k+\#\text{total number of \textsc{lost} bits set})$ time. Now the \emph{lost} bits are set only by the \textsc{Fib-Decrease-Key}. Therefore, $\#\text{total number of \textsc{lost} bits rset}=\#\text{\textsc{Fib-Decrese-Key} was called}$. Therefore, the total time taken by all the \textsc{Fib-Decrese-Key} calls is $O(k)$.
+Now suppose in that algorithm the function \textsc{Fib-Decrease-Key} were called $k$ times. Hence, this takes $O(k+\#\text{total number of \textsc{lost} bits reset})=O(k+\#\text{total number of \textsc{lost} bits set})$ time. Now the \emph{lost} bits are set only by the \textsc{Fib-Decrease-Key}. Therefore, $\#\text{total number of \textsc{lost} bits reset}=\#\text{\textsc{Fib-Decrease-Key} was called}$. Therefore, the total time taken by all the \textsc{Fib-Decrease-Key} calls is $O(k)$.
 
-Hence, in an algorithm if $t$ times \textsc{Fib-Extract-Min} was called and $k$ times \textsc{Fib-Decrese-Key} was called then total time taken by \textsc{Fib-Extract-Min} is $O(t\log n+k)$ and total time taken by \textsc{Fib-Decrese-Key} is $O(k)$. Therefore, amortized time taken by \textsc{Fib-Extract-Min} is $O(\frac{t}{k}\log n)$ and by \textsc{Fib-Decrese-Key} is $O(1)$.
+Hence, in an algorithm if $t$ times \textsc{Fib-Extract-Min} was called and $k$ times \textsc{Fib-Decrease-Key} was called then total time taken by \textsc{Fib-Extract-Min} is $O(t\log n+k)$ and total time taken by \textsc{Fib-Decrease-Key} is $O(k)$. Therefore, amortized time taken by \textsc{Fib-Extract-Min} is $O(\frac{t}{k}\log n)$ and by \textsc{Fib-Decrease-Key} is $O(1)$.
 
-Now in the Dijkstra algorithm \textsc{Fib-Extract-Min} is called $n$ times and \textsc{Fib-Decrese-Key} is called $O(m)$ times where $n$ is the number of vertices in the graph and $m$ is the number of edges in the graph. Hence, the amortized cost of \textsc{Fib-Extract-Min} is $O(\log n)$ and \textsc{Fib-Decrease-Key} is $O(1)$. Therefore, using Fibonacci heap Dijkstra takes $(n\log n+m)$ time.
+Now in the Dijkstra algorithm \textsc{Fib-Extract-Min} is called $n$ times and \textsc{Fib-Decrease-Key} is called $O(m)$ times where $n$ is the number of vertices in the graph and $m$ is the number of edges in the graph. Hence, the amortized cost of \textsc{Fib-Extract-Min} is $O(\log n)$ and \textsc{Fib-Decrease-Key} is $O(1)$. Therefore, using Fibonacci heap Dijkstra takes $(n\log n+m)$ time.

@@ -70,7 +70,7 @@ After sorting each of the groups we takes the medians of each group. Let $z$ be 
 	\caption{\prb{Approximate-Split}$(S)$}
 \end{algorithm}
 
-So in the picture among elements in upper left the highest element is $z$ and among the elements in lower right the lowest element is $z$. We will show that the number of elements smaller than $z$ is between $\frac{n}{4} $ and $\frac{3n}{4}$. Lets call the set of elements in upper left box is $S_u$ and the set of elements in lower right box is $S_d$.
+So in the picture among elements in upper left the highest element is $z$ and among the elements in lower right the lowest element is $z$. We will show that the number of elements smaller than $z$ is between $\frac{n}{4} $ and $\frac{3n}{4}$. Let's call the set of elements in upper left box is $S_u$ and the set of elements in lower right box is $S_d$.
 
 \begin{lemma}{}{}
 	$|S_u|,|S_d|\geq\frac{n}{4}$
@@ -107,4 +107,4 @@ Hence using \prb{Approximate-Split} the final algorithm for \prb{Rank-Find} is t
 		\caption{\prb{Rank-Find}(S,k)}
 	\end{algorithm}
 \end{center}
-Replacing $T_{AS}(n)$ in the time complexity equation of $T_{RF}(n)$ we get the equation:$$T_{RF}(n)\leq O(n)+T_{RF}\lt(\frac{n}5\rt)+T_{RF}\lt(\frac{3n}{4}\rt)$$Let $T_{RF}(n)\leq kn++T_{RF}\lt(\frac{n}5\rt)+T_{RF}\lt(\frac{3n}{4}\rt)$. We claim that $T_{RF}(n)\leq cn$ for some $c\in \bbN$ for all $n\geq n_0$ where $n_0\in \bbN$. By induction we have $$T_{RF}(n)\leq kn+\frac{cn}{5}+\frac{3cn}{4}=\lt(k+\frac{19c}{20}\rt)n$$To have  $k+\frac{19c}{20}\leq c$ we have to have $k+\frac{19c}{20}\leq c\iff c\geq 20k$. So take $c\geq 20k$ and our claim follows. Hence $T_{RF}(n)=O(n)$. Since we can find any $k^{th}$ smallest number in a given set of distinct integers in linear time we can also find the median in linear time.
+Replacing $T_{AS}(n)$ in the time complexity equation of $T_{RF}(n)$ we get the equation:$$T_{RF}(n)\leq O(n)+T_{RF}\lt(\frac{n}5\rt)+T_{RF}\lt(\frac{3n}{4}\rt)$$Let $T_{RF}(n)\leq kn+T_{RF}\lt(\frac{n}5\rt)+T_{RF}\lt(\frac{3n}{4}\rt)$. We claim that $T_{RF}(n)\leq cn$ for some $c\in \bbN$ for all $n\geq n_0$ where $n_0\in \bbN$. By induction we have $$T_{RF}(n)\leq kn+\frac{cn}{5}+\frac{3cn}{4}=\lt(k+\frac{19c}{20}\rt)n$$To have  $k+\frac{19c}{20}\leq c$ we have to have $k+\frac{19c}{20}\leq c\iff c\geq 20k$. So take $c\geq 20k$ and our claim follows. Hence $T_{RF}(n)=O(n)$. Since we can find any $k^{th}$ smallest number in a given set of distinct integers in linear time we can also find the median in linear time.

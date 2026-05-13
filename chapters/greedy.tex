@@ -12,7 +12,7 @@ Before diving into the algorithm to find a matching or maximal matching we first
 	Given a graph $G=(V,E)$, $M\subseteq E$ is said to be a matching if $M$ is an independent set of edges i.e. no two edges of $M$ are incident on same vertex.
 \end{Definition}
 \begin{Definition}{Maximal Matching}{}
-	For a graph $G=(V,E)$ a matching $M\subseteq E$ is maximal if it cannot be extended and still by adding an edge.
+	For a graph $G=(V,E)$ a matching $M\subseteq E$ is maximal if it cannot be extended by adding an edge.
 \end{Definition}
 There is also a maximum matching which can be easily understood from the name:
 \begin{Definition}{Maximum Matching}{}
@@ -51,9 +51,9 @@ There is also a maximum matching which can be easily understood from the name:
 			\draw[blue, thick] (C) -- node[midway, above]{$e_2$} (D);
 		\end{tikzpicture}
 	\end{center}
-	If we start from $e_1$ we get the matching $\{e_1.e_2\}$ which is maximum matching but if we start from $e_3$ then we get only the maximal matching $\{e_3\}$ which is not maximum.}
+	If we start from $e_1$ we get the matching $\{e_1,e_2\}$ which is maximum matching but if we start from $e_3$ then we get only the maximal matching $\{e_3\}$ which is not maximum.}
 
- Since the algorithm output may not be optimal always we can ask the following question
+ Since the algorithm output may not always be optimal we can ask the following question
  \begin{question}{}{}
  	How large is the matching obtained compared to the maximum matching?
  \end{question}
@@ -98,14 +98,14 @@ Now note that there are at most  two edges in $M^{\star}$ that are adjacent to a
 \section{Huffman Encoding}
 \begin{algoprob}
 	\problemtitle{Huffman Coding}
-	\probleminput{$n$ symbols $A=(a-1,\dots, a_n)$ and their frequencies $P=(f_1,\dots, f_n)$ of using symbols}
+	\probleminput{$n$ symbols $A=(a_1,\dots, a_n)$ and their frequencies $P=(f_1,\dots, f_n)$ of using symbols}
 	\problemquestion{Create a binary encoding such that: \begin{itemize}[itemsep=-0.2cm]
 			\item Prefix Free: The code for one word can not be prefix for another code
 			\item Minimality: Minimize $\prb{Cost}(b)=\sum\limits_{i=1}^n f_i\cdot \prb{Len}(b(a_i))$ where $b:A\to \{0,1\}^*$ is the binary encoding
 	\end{itemize}}
 \end{algoprob}
 
-Assignment of binary strings can also be scene as placing the symbols in a binary tree where at any node $0$ means left child and $1$ means right child. Then the first condition implies that there can not be two codes which lies in the same path from the root to a leaf. I.e. it means that all the codes have to be in the leaves. Then the length of the binary coding for a symbol  is the height of the symbol in the binary tree. 
+Assignment of binary strings can also be seen as placing the symbols in a binary tree where at any node $0$ means left child and $1$ means right child. Then the first condition implies that there can not be two codes which lies in the same path from the root to a leaf. I.e. it means that all the codes have to be in the leaves. Then the length of the binary coding for a symbol  is the height of the symbol in the binary tree. 
 
 We can think the frequencies as the probability of appearing for a letter. We denote the probability of appearing of the letter $a_i$ by $p(a_i)\coloneqq \frac{f_i}{\sum\limits_{i=1}^nf_i}$. So the we can see the updated cost function $$\prb{Cost}(b)=\sum\limits_{i=1}^n p(a_i)\cdot\prb{Len}(b(a_i))$$And from now on we will see the frequencies as probabilities and cost function like this
 
@@ -393,7 +393,7 @@ Therefore $M$ is a matroid
 		Let $\sL'=\{L_{e_1},\ldots,L_{e_l}\}$ be the collection of inclusion-wise maximal sets in $\sL$ such that $|B\cap L_{e_i}|\leq k(L_{e_i})$ with $e_i\in A\backslash B$.
 		Then $L_{e_i}\cap L_{e_j}=\emptyset$. Moreover, $|A|>|B|$ and $|A\cap L_{e_i}|\leq k(L_{e_i})$ imply that $|A\backslash (\cup L_{e_i})|>|B\backslash (\cup L_{e_i})|$. Hence there $\exs\ e_i$ such that $|A\cap L_{e_i}|>|B\cap L_{e_i}|$.
 		
-		 Now we take a look at the chain $\sL_{e_i}$. For brevity we will use $e$ instead of $e_i$. So in the chain $\sL_e=\{L_1,\dots, L_n\}$ such that  we have $$L_n\supseteq L_{n-1}\supseteq \cdots \supseteq L_2\supseteq L_1$$Then take $i\in[n]$ to be the largest index such that $|A\cap L_i|\leq |B\cap L_i|$. There will be such index because otherwise we will have $|A|\leq |B|$ which is not possible. Then take $e^*\in (A\cap L_{i+1})-(L_i\cup B)$. Such an $e^*$ will exist because $|A\cap L_{i+1}|>|A\cap L_{i+1}|\implies A\cap (L_{i+1}- L_{i}\neq \emptyset$ and also $A\cap (L_{i+1}- L_{i}\not\subseteq B\cap (L_{i+1}-L_i)$ because otherwise we will have $$|A\cap L_{i+1}|=|A\cap (L_{i+1}- L_{i}|+|A\cap L_{i+1}|\leq |B\cap (L_{i+1}-L_i)|+|B\cap L_i|=|B\cap L_{i+1}|$$which is not possible. Hence there exists $e^*$ such that $e^*\in (A\cap L_{i+1})-(L_i\cup B)$. Therefore take $B^*=B\cup \{e^*\}$. Then for all $j< i$ we have $B^*\cap L_j=B\cap L_j$ so we don't have a problem there. Now for all $j\geq i$ we have $|A\cap L_j|>|B\cap L_j|$. Hence now $|B^*\cap L_j|\leq |B\cap L_j|+1\leq |A\cap L_j|\leq k(L_j)$. Therefore we have $B^*\in\mcI$. Hence the exchange property follows.
+		 Now we take a look at the chain $\sL_{e_i}$. For brevity we will use $e$ instead of $e_i$. So in the chain $\sL_e=\{L_1,\dots, L_n\}$ such that  we have $$L_n\supseteq L_{n-1}\supseteq \cdots \supseteq L_2\supseteq L_1$$Then take $i\in[n]$ to be the largest index such that $|A\cap L_i|\leq |B\cap L_i|$. There will be such an index because otherwise we will have $|A|\leq |B|$ which is not possible. Then take $e^*\in (A\cap L_{i+1})-(L_i\cup B)$. Such an $e^*$ will exist because $|A\cap L_{i+1}|>|A\cap L_{i+1}|\implies A\cap (L_{i+1}- L_{i}\neq \emptyset$ and also $A\cap (L_{i+1}- L_{i}\not\subseteq B\cap (L_{i+1}-L_i)$ because otherwise we will have $$|A\cap L_{i+1}|=|A\cap (L_{i+1}- L_{i}|+|A\cap L_{i+1}|\leq |B\cap (L_{i+1}-L_i)|+|B\cap L_i|=|B\cap L_{i+1}|$$which is not possible. Hence there exists $e^*$ such that $e^*\in (A\cap L_{i+1})-(L_i\cup B)$. Therefore take $B^*=B\cup \{e^*\}$. Then for all $j< i$ we have $B^*\cap L_j=B\cap L_j$ so we don't have a problem there. Now for all $j\geq i$ we have $|A\cap L_j|>|B\cap L_j|$. Hence now $|B^*\cap L_j|\leq |B\cap L_j|+1\leq |A\cap L_j|\leq k(L_j)$. Therefore we have $B^*\in\mcI$. Hence the exchange property follows.
 	\end{enumerate}
 Therefore $M$ is a matroid.
 \end{proof}
@@ -484,7 +484,7 @@ Let the final set after $n$ iterations be the set $T=\{t_1,\dots, t_l\}$. Now we
 \begin{algoprob}
 	\problemtitle{Find Feasible Schedule}
 	\probleminput{Set $J$ of $n$ jobs with deadlines $d_1,\dots, d_n$ and rewards $w_1,\dots, w_n$}
-	\problemquestion{Each jobs unit time and we have a single machine to process their jobs. Give a feasible schedule of jobs with maximum reward}
+	\problemquestion{Each job takes unit time and we have a single machine to process the jobs. Give a feasible schedule of jobs with maximum reward}
 \end{algoprob}
 
 First let's define what is a schedule and what is even a feasible schedule:
@@ -493,7 +493,7 @@ First let's define what is a schedule and what is even a feasible schedule:
 	For a subset $S$ of jobs:
 	\begin{enumerate}[label=\bfseries\tiny\protect\circled{\small\arabic*}]
 	\item A schedule is an ordering of $S$
-	\item A feasible schedule is one where one job in $S$ gets finished by deadline.
+	\item A feasible schedule is one where every job in $S$ gets finished by its deadline.
 	\item A set $S\subseteq J$ is feasible if $S$ has a feasible schedule.
 	\end{enumerate}
 \end{Definition}\parinn

@@ -2,7 +2,7 @@
 \dfnc[dynamic-prog]{Dynamic Programming}{Dynamic Programming has 3 components:\begin{enumerate}
 		\item {Optimal Substructure}: Reduce problem to smaller independent problems
 		\item {Recursion}: Use recursion to solve the problems by solving smaller independent problems
-		\item {Table Filling}: Use a table to store the result to solved smaller independent problems.
+		\item {Table Filling}: Use a table to store the result of solving smaller independent problems.
 \end{enumerate}}
 \section{Longest Increasing Subsequence}
 \begin{algoprob}
@@ -84,7 +84,7 @@ We denote the state of array $M$ at $i^{th}$ iteration by $M^i$. Then we have th
 At any time $i$, $M^i[1]< M^i[2]< \cdots< M^i[n]$
 \end{lemma}
 \begin{proof}
-We will prove this by induction on $i$. The base case follows naturally. Now for $i^{th}$ iteration suppose $M^{i-1}[k]$ is replaced by $x_i$. Then we know $\forall \ j<k$ we have $M^i[j]< x_i$. By inductive hypothesis at time $t-1$ we have $M$ as an increasing sequence. Now before replacing $M^{i-1}[k]< M^{i-1}[k+1]< \cdots M^{i-1}[n]$. Now by \lemref{th:mdecreasing} $M^{i-1}[k]$ is nonincreasing. So we still have $M^{i-1}[1]< \cdots M^{i-1}[k-1]< x_i < M^{i-1}[k+1]< \cdots < M^{i-1}[n]$. Therefore, $M^{i}$ is an increasing subsequence. Hence, but mathematical induction it holds.
+We will prove this by induction on $i$. The base case follows naturally. Now for $i^{th}$ iteration suppose $M^{i-1}[k]$ is replaced by $x_i$. Then we know $\forall \ j<k$ we have $M^i[j]< x_i$. By inductive hypothesis at time $t-1$ we have $M$ as an increasing sequence. Now before replacing $M^{i-1}[k]< M^{i-1}[k+1]< \cdots M^{i-1}[n]$. Now by \lemref{th:mdecreasing} $M^{i-1}[k]$ is nonincreasing. So we still have $M^{i-1}[1]< \cdots M^{i-1}[k-1]< x_i < M^{i-1}[k+1]< \cdots < M^{i-1}[n]$. Therefore, $M^{i}$ is an increasing subsequence. Hence, by mathematical induction it holds.
 \end{proof}
 
 Now suppose at $i^{th}$ iteration $k_i$ is largest such that $M^i[k_i]<\infty$. Then $S^i$ denote the set constructed like the way we constructed at line 12--16 in the algorithm i.e. $$S^i[k_i]=M^i[k_i]\qquad \text{and}\qquad S^i[j]=T[S^i[j+1]]\quad \forall\ j\in[k_i-1]$$

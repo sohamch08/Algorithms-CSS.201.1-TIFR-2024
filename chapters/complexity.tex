@@ -1,7 +1,7 @@
 \chapter{\textsc{P, NP} and Reductions}
 Almost all the algorithms we have studied thus far have been \textbf{polynomial time algorithms} i.e. on inputs of size $n$, their worst-case running time is $O(n^k)$ for some constant $k$. A natural question to ask is whether all problems can be solved in polynomial time. The answer is no.
 
-There are problems that can be solved but not in polynomial time and there are problems which can not be solved via an algorithm. To discuss problems in general think of computational tasks as language recognition problem. A language is a subset of $\{0,1\}^*$. For example: $$L_{\textsc{conn}}=\{x\in\{0,1\}^*\mid x\text{ represents a connected graph}\}$$So main problem we want to think about is to decide whether a given string is in the language or not. These problems are also called decision problems.
+There are problems that can be solved but not in polynomial time and there are problems which can not be solved via an algorithm. To discuss problems in general think of computational tasks as language recognition problems. A language is a subset of $\{0,1\}^*$. For example: $$L_{\textsc{conn}}=\{x\in\{0,1\}^*\mid x\text{ represents a connected graph}\}$$So main problem we want to think about is to decide whether a given string is in the language or not. These problems are also called decision problems.
 \begin{definition}{Decision Problems}{}
     Given a language $L\subseteq \{0,1\}^*$ and a string $x\in\{0,1\}^*$ decide whether $x\in L$ or not.
 \end{definition}    An algorithm $\mcA$ solves this problem if $x\in L\iff \mcA(x)=1$. Time complexity of $\mcA$: $T_{\mcA}(n)$ is the maximum running time of $\mcA$ on any string $x$ of length $n$. Since we can work over any set of alphabets and alphabets can  be encoded into binary we will say languages are subset of $\Sg^*$ where $\Sg$ is the finite set of alphabets. 
@@ -14,17 +14,17 @@ Depending on time, space and some other resources based on how much they are use
 Now we introduce our first complexity class now. This class is called \textsc{P}. $$\textsc{P}\coloneqq \{L\subseteq \Sg^*\mid \text{ there exists a polynomial time algorithm that decides $L$}\}$$ Till now all the algorithms we have studied are in \textsc{P}.
 \begin{question}{}{}
     What about $L_{\textsc{sat}}, L_{\textsc{3col}}, L_{\textsc{2sat}}, L_{\textsc{conn}}$?
-\end{question}We know $L_{\textsc{conn}}\in \textsc{P}$ since we can run a \textsc{DFS} to check if all the vertex is reachable from a vertex. Also we know $L_{\textsc{2sat}}\in \textsc{P}$. For other languages we don't know if they are in \textsc{P}. But these problems have another noticable nature. Given a potential solution for the problem one can check if that is indeed a solution of the problem or not in polynomial-time. Let's abstract this notion:
+\end{question}We know $L_{\textsc{conn}}\in \textsc{P}$ since we can run a \textsc{DFS} to check if all the vertices are reachable from a vertex. Also we know $L_{\textsc{2sat}}\in \textsc{P}$. For other languages we don't know if they are in \textsc{P}. But these problems have another noticeable nature. Given a potential solution for the problem one can check if that is indeed a solution of the problem or not in polynomial-time. Let's abstract this notion:
 
 \begin{Definition}{Short Certificate of Membership}{}
-    A language have a short certificate of membership if there exists an algorithm $\mcA$ that runs in polynomial time and \begin{align*}
+    A language has a short certificate of membership if there exists an algorithm $\mcA$ that runs in polynomial time and \begin{align*}
         \forall\ x\in L,\ \exs\ y\in \text{poly}(|x|),       & \quad \mcA(x,y)=1  \\
         \forall\ x\notin L,\ \forall\ y\in \text{poly}(|x|), & \quad  \mcA(x,y)=0
     \end{align*}
 \end{Definition}
-What are the certificates or above-mentioned problems.   \begin{itemize}
+What are the certificates for the above-mentioned problems?   \begin{itemize}
     \item $L_{\textsc{sat}}$: Assignment of the variables. Then we can verify if every clause is satisfied
-    \item $L_{\textsc{3col}}$: Coloring of the edges.  We can verify if all the edges follows the coloring constraint.
+    \item $L_{\textsc{3col}}$: Coloring of the vertices. We can verify if all the edges follow the coloring constraint.
     \item $L_{\textsc{conn}}$: A spanning tree. We can verify if every vertex is present there.
 \end{itemize}
 

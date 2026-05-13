@@ -95,7 +95,7 @@ Let $(S,V\setminus S)$ is the global min cut with $|\dl(S)|=k$. Now probability 
 	$\bbP[e_i\notin \dl(S)\mid e_1,\dots,e_{i-1}\notin \dl(S)]  \geq 1-\frac{2}{n-i+1}$
 \end{lemma}
 \begin{proof}
-	Let $e_1,\dots, e_{i-1}\notin \dl(S)$. Hence $S$ is still a min cut in $G\setminus\{e_1,\dots, e_{i-1}\}$. Then number of edges after contracting $e_1,\dots, e_{i-1}$ is at least $\frac{k(n-i+1)}2$. Therefore $$\bbP[e_i\notin \dl(S)\mid e_1,\dots,e_{i-1}\notin \dl(S)]1-\frac{k}{\frac{k(n-i+1)}2}=1-\frac2{n-i+1}$$Therefore we have the lemma.
+	Let $e_1,\dots, e_{i-1}\notin \dl(S)$. Hence $S$ is still a min cut in $G\setminus\{e_1,\dots, e_{i-1}\}$. Then number of edges after contracting $e_1,\dots, e_{i-1}$ is at least $\frac{k(n-i+1)}2$. Therefore $$\bbP[e_i\notin \dl(S)\mid e_1,\dots,e_{i-1}\notin \dl(S)]=1-\frac{k}{\frac{k(n-i+1)}2}=1-\frac2{n-i+1}$$Therefore we have the lemma.
 \end{proof}
 
 Hence we have \begin{align*}

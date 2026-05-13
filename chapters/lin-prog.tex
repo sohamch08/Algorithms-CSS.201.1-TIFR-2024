@@ -149,7 +149,7 @@ Hence using \thmref{lp-solve-polytime} if the polytope is integral we can find o
 
 The following theorem lets us to give a necessary and sufficient condition to check if a given matrix is TUM. Again we will accept the following theorem without the proof since the proof is a little nontrivial.
 \begin{Theorem}{}{}
-	Let $A\in\{-1,0,1\}^{m\times n}$. Then $A$ is TU iff every set $S\subseteq [n]$ can be partitioned into $S_1, S_2$ such that $$\sum_{i\in S_1}A_i-\sum_{i\in S_2}A_i\in \{-1,0,1\}^m$$where $A_i$ is the $i^{th}$ column of $A$. C
+	Let $A\in\{-1,0,1\}^{m\times n}$. Then $A$ is TU iff every set $S\subseteq [n]$ can be partitioned into $S_1, S_2$ such that $$\sum_{i\in S_1}A_i-\sum_{i\in S_2}A_i\in \{-1,0,1\}^m$$where $A_i$ is the $i^{th}$ column of $A$.
 \end{Theorem}
 \subsection{Integrality of Some Well-Known Polytopes}
 Now using this theorem we will show that the polytope for bipartite maximum matching is integral. The LP for bipartite maximum matching is given by:
@@ -220,7 +220,7 @@ If the primal LP is in canonical form then we have the following:
 	\begin{mini*}
 		{}{b^Ty}{}{}
 		\addConstraint{A^Ty\leq c}
-		\addConstraint{x\geq 0}
+		\addConstraint{y\geq 0}
 	\end{mini*}
 	\begin{center}
 		$\boxed{\text{Dual}}$
@@ -250,7 +250,7 @@ If the primal LP is in canonical form then we have the following:
 	\end{maxi*}Hence the dual of this LP is 	\begin{mini*}{}{\tdc^Tz}{}{}
 		\addConstraint{}{\tdA^Tz=\tdb}{\quad z\in\bbR^{2n+m}}
 		\addConstraint{}{z\geq 0}{}
-	\end{mini*}Let $z=\mat{ p & q & r}^T$ where $p,q\in bbR^n$ and $r\in\bbR^m$ and let $r_i$ denote the $i^{th}$ coordinate of $r$ for $i\in [m]$. . For any feasible solution $z$ of the LP $Ap-Aq-r=-b\iff A(q-p)+r=b$. Take $w=q-p$ then $$Ap-Aq-r=-b\iff A(q-p)+r=b\iff Aw+r=b$$Since $r\geq 0$ we have $Aw\leq b$. And we have the minimize $$\tdc^z=c^Tp-\tdc^Tq=c^T(p-q)$$Hence it is equivalent to maximize $c^Tw$. Since final cost vector doesn't depend on the vector $r$ we can disregard $r$ from the constraints and replace with $Aw\leq r$. Therefore the above LP is equivalent to  \begin{maxi*}{}{c^Tw}{}{}
+	\end{mini*}Let $z=\mat{ p & q & r}^T$ where $p,q\in \bbR^n$ and $r\in\bbR^m$ and let $r_i$ denote the $i^{th}$ coordinate of $r$ for $i\in [m]$. . For any feasible solution $z$ of the LP $Ap-Aq-r=-b\iff A(q-p)+r=b$. Take $w=q-p$ then $$Ap-Aq-r=-b\iff A(q-p)+r=b\iff Aw+r=b$$Since $r\geq 0$ we have $Aw\leq b$. And we have the minimize $$\tdc^z=c^Tp-\tdc^Tq=c^T(p-q)$$Hence it is equivalent to maximize $c^Tw$. Since final cost vector doesn't depend on the vector $r$ we can disregard $r$ from the constraints and replace with $Aw\leq r$. Therefore the above LP is equivalent to  \begin{maxi*}{}{c^Tw}{}{}
 		\addConstraint{}{A w\leq b}{\quad w\in\bbR^n}
 	\end{maxi*}This is LP is exactly the primal LP. Hence the dual of dual LP is the primal LP.
 \end{proof-of-lemma}
@@ -299,7 +299,7 @@ If $x,y$ are feasible solutions for the primal and dual LPs respectively and the
 \end{Theorem}
 \begin{proof}
 	We have \begin{align*}
-		b^T\leq \sum\limits_{j=1}^d y_j(A_j x)+\sum\limits_{j=d+1}^m y_j(A_j x)=\sum\limits_{j=1}^dy_jA_jx=\sum\limits_{j=1}^m\sum\limits_{i=1}^n y_j A_{ji}x_i=\sum\limits_{i=1}^n x_i\sum\limits_{j=1}^m A_{ji}y_j\leq \sum\limits_{i=1}^m x_ic_i=c^x
+		b^Ty\leq \sum\limits_{j=1}^d y_j(A_j x)+\sum\limits_{j=d+1}^m y_j(A_j x)=\sum\limits_{j=1}^dy_jA_jx=\sum\limits_{j=1}^m\sum\limits_{i=1}^n y_j A_{ji}x_i=\sum\limits_{i=1}^n x_i\sum\limits_{j=1}^m A_{ji}y_j\leq \sum\limits_{i=1}^m x_ic_i=c^Tx
 	\end{align*}Hence we have the theorem.
 \end{proof}
 

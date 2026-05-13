@@ -493,20 +493,20 @@ For the \textsc{Union} operation we change the root of smaller rank to point to 
 	}
 	\Else{
 		$v.\emph{parent}\longleftarrow u$\;
-		$u.\emph{rank}\longleftarrow vu.\emph{rank}+1$
+		$u.\emph{rank}\longleftarrow u.\emph{rank}+1$
 	}
 \end{algorithm}
 Since in \textsc{Union}$(u,v)$ we assume $u,v$ are component representatives before using \textsc{Union}$(u,v)$ we use \textsc{Find} on $u$ and $v$ to get the roots of their components, and then we apply \textsc{Union} on the roots. Hence, \textsc{Union}$(u,v)$ takes $O(1)$ time.
 \subsection{Analyzing the Union-Find Data-Structure}\label{analysis-union-find}
 We call a node in the union-find data-structure a \emph{leader} if it is the root of the tree.
 \begin{lemma}{}{}
-	Once a node stop being a {leader} (i.e. the node in top of a tree). It can never become a leader again.
+	Once a node stops being a {leader} (i.e. the node in top of a tree). It can never become a leader again.
 \end{lemma}
 \begin{proof}
 	A node $x$ stops being a {leader} only because of the \prb{Union} operation which made $x$ child of a node $y$ which is a {leader} of a tree. From this point on, the only operation that might change the parent pointer of $x$ is the \prb{Find} operation which traverses through $x$. Since path-compression only change the parent pointer of $x$ to point to some other node $y$. Therefore, the parent pointer of $x$ will never become equal to itself i.e. $x$ can never be a {leader} again. Hence, once $x$ stops being a {leader} it can never be a {leader} again.
 \end{proof}
 \begin{lemma}{}{}
-	Once a node stop being a leader then its rank is fixed.
+	Once a node stops being a leader then its rank is fixed.
 \end{lemma}
 \begin{proof}
 	The rank of a node changes only by a \prb{Union} operation. But the \prb{Union} operation only changes the rank of nodes that are {leader} after the operation is done. Therefore, once a node stops being a {leader} it's rank will not being changed by a \prb{Union} operation. Hence, once a node stop being a leader then its rank is fixed.
